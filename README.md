@@ -8,7 +8,7 @@ The validation layer performs **data integrity validation only** and does **not 
 
 ---
 
-# Project Objective
+# Project Objective 
 
 The objective of this system is to create a **deterministic and contract-safe validation boundary inside the NICAI intelligence pipeline**.
 
