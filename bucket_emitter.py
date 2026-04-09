@@ -9,7 +9,7 @@ def emit_bucket_artifact(validation_output):
     artifact = {
         "trace_id": validation_output["trace_id"],
         "signal_id": validation_output["signal_id"],
-        "status": validation_output["status"],
+        "status": validation_output["status"], 
         "confidence_score": validation_output["confidence_score"],
         "reason": validation_output["reason"],
         "timestamp": datetime.utcnow().isoformat(),
