@@ -11,3 +11,4 @@
 {"trace_id": "ddcf9985059f61b03c1600f8f6f66ccf8196b176a7bc329a1a7370d6dff75841", "signal_id": "SIG920", "status": "ALLOW", "confidence_score": 0.92, "reason": "valid signal", "timestamp": "2026-04-09T11:47:55.799877", "layer": "NICAI_VALIDATION"}
 {"trace_id": "ddcf9985059f61b03c1600f8f6f66ccf8196b176a7bc329a1a7370d6dff75841", "signal_id": "SIG920", "status": "ALLOW", "confidence_score": 0.92, "reason": "valid signal", "timestamp": "2026-04-09T11:50:28.373997", "layer": "NICAI_VALIDATION"}
 {"trace_id": "ddcf9985059f61b03c1600f8f6f66ccf8196b176a7bc329a1a7370d6dff75841", "signal_id": "SIG920", "status": "ALLOW", "confidence_score": 0.92, "reason": "valid signal", "timestamp": "2026-04-09T11:51:44.834931", "layer": "NICAI_VALIDATION"}
+ 
