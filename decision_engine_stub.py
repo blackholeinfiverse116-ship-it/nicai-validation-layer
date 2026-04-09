@@ -4,7 +4,7 @@ def make_decision(analytics_output):
 
     if anomaly > 0.6:
         decision = "ALERT"
-        risk = "HIGH"
+        risk = "HIGH" 
     elif anomaly > 0.3:
         decision = "REVIEW"
         risk = "MEDIUM"
