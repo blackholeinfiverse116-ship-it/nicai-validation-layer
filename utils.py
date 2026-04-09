@@ -9,7 +9,7 @@ def generate_trace_id(signal):
 
     Same input → same trace_id.
     Handles malformed inputs safely.
-    """
+    """ 
 
     signal_id = str(signal.get("signal_id", "unknown"))
     timestamp = str(signal.get("timestamp", "unknown"))
