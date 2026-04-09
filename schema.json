@@ -8,7 +8,7 @@
   "reason"
  ],
  "properties": {
-  "signal_id": { "type": ["string", "null"] },
+  "signal_id": { "type": ["string", "null"] }, 
   "status": { "type": "string" },
   "confidence_score": { "type": "number" },
   "trace_id": { "type": "string" },
