@@ -1,7 +1,7 @@
 {
   "total_signals": 2,
   "reject_count": 0,
-  "flag_count": 1
+  "flag_count": 1 
 }{"trace_id": "f7accfbddd1f68db2bdc397c95a583e74a0e9e742bc780616bca81fe195f3929", "dataset_id": "DS01", "status": "ALLOW", "confidence_score": 0.92, "timestamp": "2026-04-08T03:24:50.338538"}
 {"trace_id": "7905a6fbee25140a5e9e6949bfe6e405132f9d480b731843d5049e29b93c5343", "dataset_id": "DS02", "status": "FLAG", "confidence_score": 0.45, "timestamp": "2026-04-08T03:24:50.349733"}
 {"trace_id": "bf6880bc9922c831abfd30046020a9f641f5673c417f1630e91c3bc0ce2f78ea", "dataset_id": "DS01", "status": "REJECT", "confidence_score": 0.0, "timestamp": "2026-04-08T03:24:50.357388"}
