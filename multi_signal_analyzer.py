@@ -1,12 +1,23 @@
 import hashlib
+import json
 from collections import defaultdict
+
+
+# -----------------------------
+# 🔹 SAFE SERIALIZER
+# -----------------------------
+def json_safe_string(obj):
+    try:
+        return json.dumps(obj, default=str)
+    except:
+        return str(obj)
 
 
 # -----------------------------
 # 🔹 PATTERN ID GENERATOR
 # -----------------------------
 def generate_pattern_id(linked_traces):
-    base = "".join(sorted(linked_traces))
+    base = "".join(sorted(map(str, linked_traces)))
     return "PATTERN_" + hashlib.sha256(base.encode()).hexdigest()[:6]
 
 
@@ -23,7 +34,7 @@ def analyze_patterns(outputs):
     for o in outputs:
 
         # -----------------------------
-        # 🔹 SAFE INPUT CHECK
+        # SAFE INPUT CHECK
         # -----------------------------
         if not isinstance(o, dict):
             continue
@@ -33,45 +44,45 @@ def analyze_patterns(outputs):
         trace_id = o.get("trace_id")
 
         # -----------------------------
-        # 🔹 ANOMALY CONDITION
+        # ANOMALY CHECK
         # -----------------------------
         if risk == "HIGH" or anomaly_score >= 0.6:
 
             anomaly_count += 1
 
-            # trace tracking
             if trace_id is not None:
                 linked_traces.append(str(trace_id))
 
             # -----------------------------
-            # 🔹 SAFE ZONE HANDLING (FIXED)
+            # SAFE ZONE HANDLING (FIXED ROOT CAUSE)
             # -----------------------------
             lat = o.get("latitude")
             lon = o.get("longitude")
 
-            zone = None
-
-            if isinstance(lat, (int, float)) and isinstance(lon, (int, float)):
+            try:
+                lat = float(lat)
+                lon = float(lon)
                 zone = f"{lat}_{lon}"
-            else:
+            except:
                 zone = o.get("zone", "Unknown")
 
-            # FORCE SAFE TYPE (IMPORTANT FIX)
+            # FORCE FULL SAFETY
             if isinstance(zone, (dict, list, tuple)):
                 zone = json_safe_string(zone)
 
             zone = str(zone)
 
+            # 🔥 GUARANTEED SAFE HERE
             affected_zones.add(zone)
             zone_frequency[zone] += 1
 
     # -----------------------------
-    # 🔹 PATTERN ID
+    # PATTERN ID
     # -----------------------------
     pattern_id = generate_pattern_id(linked_traces)
 
     # -----------------------------
-    # 🔹 SEVERITY
+    # SEVERITY LOGIC
     # -----------------------------
     if anomaly_count >= 5:
         severity_trend = "INCREASING"
@@ -104,14 +115,3 @@ def analyze_patterns(outputs):
 # -----------------------------
 def analyze_multi_signals(outputs):
     return analyze_patterns(outputs)
-
-
-# -----------------------------
-# 🔹 SAFE SERIALIZER HELPER (IMPORTANT)
-# -----------------------------
-def json_safe_string(obj):
-    try:
-        import json
-        return json.dumps(obj, default=str)
-    except:
-        return str(obj)
