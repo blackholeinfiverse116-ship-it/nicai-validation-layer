@@ -489,6 +489,18 @@ nicai_validation_layer
 
 ---
 
+Deployment Status
+
+The NICAI system is deployment-ready.
+
+The application can be deployed using FastAPI + Uvicorn
+on cloud platforms such as Render or VPS.
+
+Final deployment to nicai.blackholeinfiverse.com
+will be handled by the DevOps team.
+
+---
+
 # Developer
 
 **Ankita Prajapati**
