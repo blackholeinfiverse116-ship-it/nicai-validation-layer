@@ -15,15 +15,9 @@ templates = Jinja2Templates(directory="templates")
 
 
 # -----------------------------
-# 🔹 SAFE NORMALIZER (IMPORTANT FIX)
+# SAFE NORMALIZER
 # -----------------------------
 def normalize_signal(signal):
-    """
-    Ensures signal is always dict.
-    Handles both:
-    - dict input
-    - JSON string input
-    """
     if isinstance(signal, str):
         try:
             return json.loads(signal)
@@ -33,7 +27,7 @@ def normalize_signal(signal):
 
 
 # -----------------------------
-# 🔹 Logging Utility
+# LOGGING
 # -----------------------------
 def log_data(filename, data):
     try:
@@ -44,7 +38,7 @@ def log_data(filename, data):
 
 
 # -----------------------------
-# 1️⃣ VALIDATION API
+# VALIDATE
 # -----------------------------
 @app.post("/validate")
 def validate(signal: dict):
@@ -58,11 +52,11 @@ def validate(signal: dict):
         return validation
 
     except Exception as e:
-        return handle_error(str(e))
+        return handle_error(e)
 
 
 # -----------------------------
-# 2️⃣ PIPELINE API
+# PIPELINE
 # -----------------------------
 @app.post("/pipeline")
 def run_pipeline(signal: dict):
@@ -83,11 +77,11 @@ def run_pipeline(signal: dict):
         }
 
     except Exception as e:
-        return handle_error(str(e))
+        return handle_error(e)
 
 
 # -----------------------------
-# 3️⃣ NICAI FINAL API
+# NICAI EVALUATE
 # -----------------------------
 @app.post("/nicai/evaluate")
 def evaluate_signal(signal: dict):
@@ -102,14 +96,13 @@ def evaluate_signal(signal: dict):
 
         analytics = analyze_signal(signal)
 
-        risk = analytics.get("risk", "LOW")
+        risk = analytics.get("risk_level", "LOW")
 
-        if risk == "HIGH":
-            recommendation = "IMMEDIATE_ACTION"
-        elif risk == "MEDIUM":
-            recommendation = "MONITOR"
-        else:
-            recommendation = "SAFE"
+        recommendation = (
+            "IMMEDIATE_ACTION" if risk == "HIGH"
+            else "MONITOR" if risk == "MEDIUM"
+            else "SAFE"
+        )
 
         return {
             "signal_id": validation.get("signal_id"),
@@ -118,17 +111,17 @@ def evaluate_signal(signal: dict):
             "trace_id": validation.get("trace_id"),
             "anomaly_score": analytics.get("anomaly_score", 0.5),
             "risk_level": risk,
-            "anomaly_type": analytics.get("type", "NORMAL"),
+            "anomaly_type": analytics.get("anomaly_type", "NORMAL"),
             "explanation": analytics.get("explanation", "No issue"),
             "recommendation_signal": recommendation
         }
 
     except Exception as e:
-        return handle_error(str(e))
+        return handle_error(e)
 
 
 # -----------------------------
-# 4️⃣ BATCH RUN
+# BATCH RUN
 # -----------------------------
 @app.get("/run")
 def run_full_pipeline():
@@ -151,7 +144,7 @@ def run_full_pipeline():
 
                 analytics = analyze_signal(signal)
 
-                risk = analytics.get("risk", "LOW")
+                risk = analytics.get("risk_level", "LOW")
 
                 recommendation = (
                     "IMMEDIATE_ACTION" if risk == "HIGH"
@@ -166,15 +159,14 @@ def run_full_pipeline():
                     "trace_id": validation.get("trace_id"),
                     "anomaly_score": analytics.get("anomaly_score", 0.5),
                     "risk_level": risk,
-                    "anomaly_type": analytics.get("type", "NORMAL"),
+                    "anomaly_type": analytics.get("anomaly_type", "NORMAL"),
                     "explanation": analytics.get("explanation", "No issue"),
                     "recommendation_signal": recommendation
                 })
 
                 log_data("validation_logs.json", validation)
 
-            except Exception as inner_e:
-                log_data("error_logs.json", {"error": str(inner_e)})
+            except Exception:
                 continue
 
         summary = analyze_multi_signals(results)
@@ -186,11 +178,11 @@ def run_full_pipeline():
         }
 
     except Exception as e:
-        return handle_error(str(e))
+        return handle_error(e)
 
 
 # -----------------------------
-# 5️⃣ DASHBOARD
+# DASHBOARD (FIXED CRITICAL ISSUE)
 # -----------------------------
 @app.get("/dashboard")
 def dashboard(request: Request):
@@ -215,26 +207,29 @@ def dashboard(request: Request):
 
                 results.append({
                     "signal_id": signal.get("signal_id"),
-                    "risk_level": analytics.get("risk"),
-                    "anomaly_type": analytics.get("type"),
+                    "risk_level": analytics.get("risk_level"),
+                    "anomaly_type": analytics.get("anomaly_type"),
                     "explanation": analytics.get("explanation"),
                     "trace_id": validation.get("trace_id")
                 })
 
-            except Exception as inner_e:
+            except Exception:
                 continue
+
+        # 🔥 IMPORTANT FIX: prevent Jinja crash
+        safe_results = json.loads(json.dumps(results, default=str))
 
         return templates.TemplateResponse("dashboard.html", {
             "request": request,
-            "data": results
+            "data": safe_results
         })
 
     except Exception as e:
-        return handle_error(str(e))
+        return handle_error(e)
 
 
 # -----------------------------
-# 6️⃣ ACTION API
+# ACTION API
 # -----------------------------
 @app.post("/action")
 def trigger_action(data: dict):
@@ -258,4 +253,4 @@ def trigger_action(data: dict):
         }
 
     except Exception as e:
-        return handle_error(str(e))
+        return handle_error(e)
