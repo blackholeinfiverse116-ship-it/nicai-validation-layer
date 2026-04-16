@@ -1,19 +1,10 @@
 import pandas as pd
-import os
 
 
-# -----------------------------
-# 1️⃣ LOAD DATA
-# -----------------------------
 def load_data():
     try:
-        base_path = os.getcwd()
-
-        weather_path = os.path.join(base_path, "clean_weather.csv")
-        aqi_path = os.path.join(base_path, "clean_aqi.csv")
-
-        weather = pd.read_csv(weather_path)
-        aqi = pd.read_csv(aqi_path)
+        weather = pd.read_csv("clean_weather.csv")
+        aqi = pd.read_csv("clean_aqi.csv")
 
         print("✅ Data Loaded Successfully")
         return weather, aqi
@@ -23,24 +14,20 @@ def load_data():
         return None, None
 
 
-# -----------------------------
-# 2️⃣ CONVERT TO NICAI SIGNALS
-# -----------------------------
 def convert_to_signals(weather, aqi):
 
-    # ✅ SAFETY CHECK
     if weather is None or aqi is None:
-        print("❌ Data is None, cannot convert signals")
+        print("❌ Data not loaded")
         return []
 
     signals = []
 
-    # -----------------------------
-    # Weather signals
-    # -----------------------------
+    # Weather
     for i, row in weather.iterrows():
 
-        if pd.isna(row.get("temperature")):
+        temp = row.get("temperature") or row.get("temp") or row.get("Temperature")
+
+        if pd.isna(temp):
             continue
 
         signals.append({
@@ -49,16 +36,16 @@ def convert_to_signals(weather, aqi):
             "latitude": float(row.get("latitude", 0.0)),
             "longitude": float(row.get("longitude", 0.0)),
             "feature_type": "temperature",
-            "value": float(row["temperature"]),
+            "value": float(temp),
             "dataset_id": "DS_WEATHER"
         })
 
-    # -----------------------------
-    # AQI signals
-    # -----------------------------
+    # AQI
     for i, row in aqi.iterrows():
 
-        if pd.isna(row.get("aqi")):
+        aqi_val = row.get("aqi") or row.get("AQI")
+
+        if pd.isna(aqi_val):
             continue
 
         signals.append({
@@ -67,7 +54,7 @@ def convert_to_signals(weather, aqi):
             "latitude": float(row.get("latitude", 0.0)),
             "longitude": float(row.get("longitude", 0.0)),
             "feature_type": "aqi",
-            "value": float(row["aqi"]),
+            "value": float(aqi_val),
             "dataset_id": "DS_AQI"
         })
 
