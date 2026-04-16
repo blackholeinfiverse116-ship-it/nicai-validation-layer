@@ -1,18 +1,15 @@
 import pandas as pd
+import os
 
 
-# -----------------------------
-# 1️⃣ LOAD DATA
-# -----------------------------
 def load_data():
     try:
+        print("FILES IN DIR:", os.listdir())  
+
         weather = pd.read_csv("clean_weather.csv")
         aqi = pd.read_csv("clean_aqi.csv")
 
         print("✅ Data Loaded Successfully")
-        print("Weather rows:", len(weather))
-        print("AQI rows:", len(aqi))
-
         return weather, aqi
 
     except Exception as e:
