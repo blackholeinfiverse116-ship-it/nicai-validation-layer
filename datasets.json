@@ -1,0 +1,10 @@
+{
+  "DS_WEATHER": {
+    "status": "active",
+    "trust_score": 0.9
+  },
+  "DS_AQI": {
+    "status": "active",
+    "trust_score": 0.85
+  }
+}
