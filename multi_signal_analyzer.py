@@ -2,8 +2,7 @@ import uuid
 from collections import defaultdict
 
 
-def analyze_patterns(outputs):
-
+def analyze_multi_signals(outputs):
     anomaly_count = 0
     affected_zones = set()
     linked_traces = []
