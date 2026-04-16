@@ -1,8 +1,5 @@
 def analyze_signal(signal):
 
-    # -----------------------------
-    # 🔹 INPUT SAFETY
-    # -----------------------------
     if not isinstance(signal, dict):
         return {
             "risk_level": "LOW",
@@ -12,87 +9,65 @@ def analyze_signal(signal):
             "recommendation_signal": "MONITOR"
         }
 
-    # -----------------------------
-    # 🔹 SAFE EXTRACTION
-    # -----------------------------
     value = signal.get("value", 0)
 
     try:
         value = float(value)
     except:
-        value = 0
+        value = 0.0
 
-    feature = signal.get("feature_type") or ""
-    feature = str(feature).lower()
+    feature = str(signal.get("feature_type") or "").lower()
 
-    # -----------------------------
-    # 🔹 DEFAULT STATE
-    # -----------------------------
     risk_level = "LOW"
     anomaly_score = 0.2
     anomaly_type = "NORMAL"
     explanation = "Everything normal"
 
-    # -----------------------------
-    # 🌡 TEMPERATURE
-    # -----------------------------
+    # ---------------- TEMPERATURE ----------------
     if feature == "temperature":
-
         if value >= 45:
             risk_level = "HIGH"
             anomaly_score = 0.9
             anomaly_type = "TEMPERATURE_SPIKE"
             explanation = "Extreme temperature detected"
-
         elif value >= 38:
             risk_level = "MEDIUM"
             anomaly_score = 0.6
             anomaly_type = "TEMPERATURE_RISE"
             explanation = "Temperature rising above safe threshold"
 
-    # -----------------------------
-    # 🌫 AQI
-    # -----------------------------
+    # ---------------- AQI ----------------
     elif feature == "aqi":
-
         if value >= 300:
             risk_level = "HIGH"
             anomaly_score = 0.95
             anomaly_type = "SEVERE_AIR_POLLUTION"
             explanation = "Air quality extremely hazardous"
-
         elif value >= 200:
             risk_level = "MEDIUM"
             anomaly_score = 0.7
             anomaly_type = "HIGH_POLLUTION"
             explanation = "Air quality unhealthy"
 
-    # -----------------------------
-    # 🚦 TRAFFIC
-    # -----------------------------
+    # ---------------- TRAFFIC ----------------
     elif feature == "traffic":
-
         if value >= 90:
             risk_level = "HIGH"
             anomaly_score = 0.85
             anomaly_type = "TRAFFIC_CONGESTION"
             explanation = "Severe traffic congestion detected"
-
         elif value >= 70:
             risk_level = "MEDIUM"
             anomaly_score = 0.6
             anomaly_type = "HEAVY_TRAFFIC"
             explanation = "Traffic density increasing"
 
-    # -----------------------------
-    # 🎯 FINAL DECISION
-    # -----------------------------
-    if risk_level == "HIGH":
-        recommendation = "ESCALATE"
-    elif risk_level == "MEDIUM":
-        recommendation = "INVESTIGATE"
-    else:
-        recommendation = "MONITOR"
+    # ---------------- DECISION ----------------
+    recommendation = (
+        "ESCALATE" if risk_level == "HIGH"
+        else "INVESTIGATE" if risk_level == "MEDIUM"
+        else "MONITOR"
+    )
 
     return {
         "risk_level": risk_level,
