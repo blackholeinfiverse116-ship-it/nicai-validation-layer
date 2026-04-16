@@ -1,5 +1,13 @@
-import uuid
+import hashlib
 from collections import defaultdict
+
+
+def generate_pattern_id(linked_traces):
+    """
+    Deterministic pattern id based on traces
+    """
+    base = "".join(sorted(linked_traces))
+    return "PATTERN_" + hashlib.sha256(base.encode()).hexdigest()[:6]
 
 
 def analyze_patterns(outputs):
@@ -7,11 +15,13 @@ def analyze_patterns(outputs):
     anomaly_count = 0
     affected_zones = set()
     linked_traces = []
-
     zone_frequency = defaultdict(int)
 
-    # loop through signal outputs
     for o in outputs:
+
+        # --- SAFETY: ensure dict ---
+        if not isinstance(o, dict):
+            continue
 
         risk = o.get("risk_level")
         trace_id = o.get("trace_id")
@@ -20,30 +30,32 @@ def analyze_patterns(outputs):
 
             anomaly_count += 1
 
-            # capture trace ids
+            # trace tracking
             if trace_id:
-                linked_traces.append(trace_id)
+                linked_traces.append(str(trace_id))
 
-            # detect zone safely
+            # --- SAFE ZONE EXTRACTION ---
             lat = o.get("latitude")
             lon = o.get("longitude")
 
-            # FIX 1: correct lat/lon check
-            if lat is not None and lon is not None:
+            if isinstance(lat, (int, float)) and isinstance(lon, (int, float)):
                 zone = f"{lat}_{lon}"
             else:
                 zone = o.get("zone", "Unknown")
 
-            # FIX 2: force string (avoid unhashable dict error)
+            # 🚨 FINAL SAFETY (fix unhashable issue)
+            if isinstance(zone, dict):
+                zone = str(zone)
+
             zone = str(zone)
 
             affected_zones.add(zone)
             zone_frequency[zone] += 1
 
-    # pattern id
-    pattern_id = "PATTERN_" + str(uuid.uuid4())[:6]
+    # --- DETERMINISTIC PATTERN ID ---
+    pattern_id = generate_pattern_id(linked_traces)
 
-    # severity trend logic
+    # --- severity trend ---
     if anomaly_count >= 5:
         severity_trend = "INCREASING"
     elif anomaly_count >= 2:
@@ -51,7 +63,7 @@ def analyze_patterns(outputs):
     else:
         severity_trend = "LOW"
 
-    # pattern type detection
+    # --- pattern type ---
     if anomaly_count >= 5:
         pattern_type = "CLUSTER_ANOMALY"
     elif anomaly_count >= 2:
@@ -59,7 +71,7 @@ def analyze_patterns(outputs):
     else:
         pattern_type = "ISOLATED_EVENT"
 
-    # pattern summary
+    # --- summary ---
     if anomaly_count >= 5:
         summary = "Clustered high-risk anomalies detected in nearby region"
     elif anomaly_count > 0:
@@ -67,19 +79,17 @@ def analyze_patterns(outputs):
     else:
         summary = "No major anomalies"
 
-    pattern_output = {
+    return {
         "pattern_id": pattern_id,
         "anomaly_count": anomaly_count,
-        "affected_zones": list(affected_zones),
+        "affected_zones": sorted(list(affected_zones)),  # deterministic order
         "pattern_summary": summary,
         "pattern_type": pattern_type,
         "severity_trend": severity_trend,
-        "linked_traces": linked_traces
+        "linked_traces": sorted(linked_traces)  # deterministic
     }
 
-    return pattern_output
 
-
-# 🔥 IMPORTANT: add this function (missing in your project)
+# wrapper
 def analyze_multi_signals(outputs):
     return analyze_patterns(outputs)
