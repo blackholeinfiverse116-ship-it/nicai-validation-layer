@@ -23,11 +23,13 @@ def normalize_signal(signal):
             return json.loads(signal)
         except Exception:
             return {}
+    if not isinstance(signal, dict):
+        return {}
     return signal
 
 
 # -----------------------------
-# LOGGING
+# SAFE LOGGING
 # -----------------------------
 def log_data(filename, data):
     try:
@@ -38,16 +40,14 @@ def log_data(filename, data):
 
 
 # -----------------------------
-# VALIDATE
+# VALIDATE API
 # -----------------------------
 @app.post("/validate")
 def validate(signal: dict):
     try:
         signal = normalize_signal(signal)
-
         validation = validate_signal(signal)
         log_data("validation_logs.json", validation)
-
         return validation
 
     except Exception as e:
@@ -55,7 +55,7 @@ def validate(signal: dict):
 
 
 # -----------------------------
-# PIPELINE
+# PIPELINE API
 # -----------------------------
 @app.post("/pipeline")
 def run_pipeline(signal: dict):
@@ -63,7 +63,6 @@ def run_pipeline(signal: dict):
         signal = normalize_signal(signal)
 
         validation = validate_signal(signal)
-
         if validation["status"] == "REJECT":
             return {"validation": validation}
 
@@ -79,7 +78,7 @@ def run_pipeline(signal: dict):
 
 
 # -----------------------------
-# NICAI EVALUATE
+# NICAI API
 # -----------------------------
 @app.post("/nicai/evaluate")
 def evaluate_signal(signal: dict):
@@ -87,7 +86,6 @@ def evaluate_signal(signal: dict):
         signal = normalize_signal(signal)
 
         validation = validate_signal(signal)
-
         if validation["status"] == "REJECT":
             return validation
 
@@ -130,11 +128,12 @@ def run_full_pipeline():
 
         for signal in signals[:50]:
 
+            signal = normalize_signal(signal)
+            if not signal:
+                continue
+
             try:
-                signal = normalize_signal(signal)
-
                 validation = validate_signal(signal)
-
                 if validation["status"] == "REJECT":
                     continue
 
@@ -149,11 +148,11 @@ def run_full_pipeline():
                 )
 
                 results.append({
-                    "signal_id": str(signal.get("signal_id")),
-                    "status": str(validation.get("status")),
-                    "confidence_score": str(validation.get("confidence_score", 0.9)),
-                    "trace_id": str(validation.get("trace_id")),
-                    "anomaly_score": str(analytics.get("anomaly_score", 0.5)),
+                    "signal_id": str(signal.get("signal_id", "")),
+                    "status": str(validation.get("status", "")),
+                    "confidence_score": float(validation.get("confidence_score", 0.9)),
+                    "trace_id": str(validation.get("trace_id", "")),
+                    "anomaly_score": float(analytics.get("anomaly_score", 0.5)),
                     "risk_level": str(risk),
                     "anomaly_type": str(analytics.get("anomaly_type", "NORMAL")),
                     "explanation": str(analytics.get("explanation", "No issue")),
@@ -178,7 +177,7 @@ def run_full_pipeline():
 
 
 # -----------------------------
-# DASHBOARD (FINAL FIX — IMPORTANT PART)
+# DASHBOARD (100% SAFE FIX)
 # -----------------------------
 @app.get("/dashboard")
 def dashboard(request: Request):
@@ -191,29 +190,33 @@ def dashboard(request: Request):
 
         for signal in signals[:20]:
 
+            signal = normalize_signal(signal)
+            if not signal:
+                continue
+
             try:
-                signal = normalize_signal(signal)
-
                 validation = validate_signal(signal)
-
                 if validation["status"] == "REJECT":
                     continue
 
                 analytics = analyze_signal(signal)
 
                 results.append({
-                    "signal_id": str(signal.get("signal_id")),
-                    "risk_level": str(analytics.get("risk_level")),
-                    "anomaly_type": str(analytics.get("anomaly_type")),
-                    "explanation": str(analytics.get("explanation")),
-                    "trace_id": str(validation.get("trace_id"))
+                    "signal_id": str(signal.get("signal_id", "")),
+                    "risk_level": str(analytics.get("risk_level", "")),
+                    "anomaly_type": str(analytics.get("anomaly_type", "")),
+                    "explanation": str(analytics.get("explanation", "")),
+                    "trace_id": str(validation.get("trace_id", ""))
                 })
 
             except Exception:
                 continue
 
-        # 🔥 FINAL SAFETY LAYER (THIS FIXES YOUR ERROR)
-        safe_results = json.loads(json.dumps(results, default=str))
+        # 🔥 IMPORTANT: remove ALL dict-type risk for Jinja crash
+        safe_results = [
+            {k: str(v) for k, v in item.items()}
+            for item in results
+        ]
 
         return templates.TemplateResponse("dashboard.html", {
             "request": request,
