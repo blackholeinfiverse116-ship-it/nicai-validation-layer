@@ -2,7 +2,7 @@ NICAI DEMO SCRIPT (FINAL — 2–3 MIN)
 
 ---
 
-## INTRO (5–7 sec)
+**INTRO (5–7 sec)**
 
 "NICAI is a deterministic intelligence system that processes real-world data and generates traceable intelligence outputs without taking decisions."
 
