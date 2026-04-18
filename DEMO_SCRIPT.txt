@@ -1,0 +1,8 @@
+STEP 1 — Load raw data
+STEP 2 — Convert to signals
+STEP 3 — Validate signals
+STEP 4 — Run anomaly detection
+STEP 5 — Show dashboard
+STEP 6 — Click action button
+STEP 7 — Open logs/action_logs.json
+STEP 8 — Show trace_id continuity
