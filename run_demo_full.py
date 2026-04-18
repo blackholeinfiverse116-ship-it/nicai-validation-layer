@@ -1,14 +1,22 @@
 """
-NICAI FULL SYSTEM DEMO (FINAL - STABLE & TANTRA ALIGNED)
+NICAI FULL SYSTEM DEMO (FINAL - STABLE + FAILURE SAFE + SINGLE COMMAND)
 """
 
 import json
+import os
 from datetime import datetime, timezone
 
 from samachar_input_adapter import load_data, convert_to_signals
 from validator import validate_signal
 from sanskar_engine import analyze_signal, analyze_patterns
 from error_handler import error_response, validate_basic_input
+
+
+# -----------------------------
+# ✅ ENSURE REQUIRED FOLDERS
+# -----------------------------
+os.makedirs("logs", exist_ok=True)
+os.makedirs("data", exist_ok=True)
 
 
 # -----------------------------
@@ -24,12 +32,15 @@ def log_data(filename, log_type, data):
         }
 
         with open(f"logs/{filename}", "a") as f:
-            f.write(json.dumps(log_entry) + "\n")
+            f.write(json.dumps(log_entry, default=str) + "\n")
 
     except Exception:
         pass
 
 
+# -----------------------------
+# DEMO RUNNER
+# -----------------------------
 def run_demo():
 
     print("\n==============================")
@@ -52,16 +63,16 @@ def run_demo():
 
         signals = convert_to_signals(weather, aqi)
 
-        # ✅ STRICT INPUT VALIDATION
+        # ✅ HARD INPUT GATE
         error = validate_basic_input(signals)
         if error:
-            print("❌ INPUT ERROR:", error)
+            print(json.dumps(error, indent=2))
             return
 
         print(f"✅ Total signals: {len(signals)}\n")
 
         # -----------------------------
-        # STEP 3 — Process signals
+        # STEP 3 — Processing
         # -----------------------------
         print("------------------------------------")
         print("STEP 3 — Running Intelligence")
@@ -73,9 +84,10 @@ def run_demo():
 
         for signal in signals[:20]:
 
-            # -----------------------------
+            if not isinstance(signal, dict):
+                continue
+
             # VALIDATION
-            # -----------------------------
             validation = validate_signal(signal)
 
             if validation.get("status") == "ERROR":
@@ -83,17 +95,13 @@ def run_demo():
 
             log_data("validation_logs.json", "VALIDATION", validation)
 
-            # -----------------------------
             # ANALYSIS
-            # -----------------------------
             analysis = analyze_signal(signal)
 
-            if isinstance(analysis, dict) and analysis.get("status") == "ERROR":
+            if not isinstance(analysis, dict) or analysis.get("status") == "ERROR":
                 continue
 
-            # -----------------------------
-            # 🔥 TANTRA SAFE RECOMMENDATION (FIX)
-            # -----------------------------
+            # ✅ TANTRA SAFE OUTPUT
             if analysis.get("risk_level") == "HIGH":
                 recommendation = "eligible_for_escalation"
             elif analysis.get("risk_level") == "MEDIUM":
@@ -114,9 +122,7 @@ def run_demo():
 
             processed_outputs.append(output)
 
-            # -----------------------------
-            # SUMMARY COUNTS
-            # -----------------------------
+            # SUMMARY
             if output["risk_level"] == "LOW":
                 low += 1
             elif output["risk_level"] == "MEDIUM":
@@ -161,67 +167,45 @@ def run_demo():
         log_data("pattern_logs.json", "PATTERN", pattern_output)
 
         # -----------------------------
-        # STEP 5 — Dashboard
+        # STEP 5 — AUTO START API 🔥
         # -----------------------------
         print("\n------------------------------------")
-        print("STEP 5 — Launch Dashboard")
+        print("STEP 5 — Starting Dashboard (AUTO)")
         print("------------------------------------\n")
 
-        print("Run in new terminal:")
-        print("uvicorn main:app --reload\n")
+        print("🚀 Launching API server...")
 
-        print("Open browser:")
+        # 🔥 SINGLE COMMAND FIX
+        os.system("uvicorn main:app --reload")
+
+        # -----------------------------
+        # STEP 6 — Instructions
+        # -----------------------------
+        print("\nOpen browser:")
         print("http://127.0.0.1:8000/dashboard\n")
 
-        # -----------------------------
-        # STEP 6 — Actions
-        # -----------------------------
-        print("------------------------------------")
-        print("STEP 6 — Trigger Actions")
-        print("------------------------------------\n")
-
-        print("Use buttons:")
+        print("Actions:")
         print("• eligible_for_escalation")
         print("• requires_review")
         print("• monitor\n")
 
-        # -----------------------------
-        # STEP 7 — Logs
-        # -----------------------------
-        print("------------------------------------")
-        print("STEP 7 — Verify Logs")
-        print("------------------------------------\n")
+        print("Check logs:")
+        print("logs/action_logs.json\n")
 
-        print("Check file: logs/action_logs.json\n")
-
-        example_log = {
-            "trace_id": "...",
-            "action_type": "eligible_for_escalation",
-            "target_role": "authority",
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
-
-        print("Example log:")
-        print(example_log)
-
-        # -----------------------------
-        # STEP 8 — TRACE CONTINUITY
-        # -----------------------------
-        print("\n------------------------------------")
-        print("STEP 8 — Trace ID Continuity")
-        print("------------------------------------\n")
-
+        # TRACE
         if processed_outputs:
             print("Sample trace_id:", processed_outputs[0].get("trace_id"))
-            print("Trace ID flows across validation → analytics → action logs\n")
 
         print("\n================================")
         print(" NICAI DEMO READY ")
         print("================================\n")
 
     except Exception as e:
-        print("❌ DEMO ERROR:", error_response(str(e)))
+        print(json.dumps(error_response(str(e)), indent=2))
 
 
+# -----------------------------
+# ENTRY POINT
+# -----------------------------
 if __name__ == "__main__":
     run_demo()
