@@ -1,8 +1,8 @@
-NICAI DEMO SCRIPT (FINAL — 2–3 MIN)
+# NICAI DEMO SCRIPT (FINAL — 2–3 MIN)
 
 ---
 
-**INTRO (5–7 sec)**
+## INTRO (5–7 sec)
 
 "NICAI is a deterministic intelligence system that processes real-world data and generates traceable intelligence outputs without taking decisions."
 
@@ -12,9 +12,8 @@ NICAI DEMO SCRIPT (FINAL — 2–3 MIN)
 
 Show:
 
-* clean_weather.csv
-* clean_aqi.csv
-
+- clean_weather.csv  
+- clean_aqi.csv  
 
 "System starts with real environmental datasets containing weather and air quality signals."
 
@@ -22,13 +21,15 @@ Show:
 
 ## STEP 2 — RUN SYSTEM (15 sec)
 
-Run:
+Run command:
+
+```bash
 python run_demo_full.py
+```
 
 Show:
 
-* Total signals count
-
+- Total signals count
 
 "These datasets are converted into standardized signals and passed into the NICAI pipeline."
 
@@ -36,10 +37,9 @@ Show:
 
 ## STEP 3 — VALIDATION + ANALYSIS (20 sec)
 
-Show console:
+Show console output:
 
-* LOW / MEDIUM / HIGH counts
-
+- LOW / MEDIUM / HIGH counts  
 
 "Each signal goes through strict validation and deterministic anomaly detection."
 
@@ -49,8 +49,7 @@ Show console:
 
 Show:
 
-* PATTERN output
-
+- PATTERN output  
 
 "System also performs multi-signal analysis to detect patterns across regions."
 
@@ -59,14 +58,16 @@ Show:
 ## STEP 5 — DASHBOARD (20 sec)
 
 Open browser:
+
+```bash
 http://127.0.0.1:8000
+```
 
 Show:
 
-* Signals table
-* Risk levels
-* Action buttons
-
+- Signals table  
+- Risk levels  
+- Action buttons  
 
 "Dashboard provides real-time visibility of validated signals and detected anomalies."
 
@@ -76,10 +77,9 @@ Show:
 
 Click any button:
 
-* eligible_for_escalation
-* requires_review
-* monitor
-
+- eligible_for_escalation  
+- requires_review  
+- monitor  
 
 "NICAI does not take decisions. It only generates structured action signals."
 
@@ -87,15 +87,17 @@ Click any button:
 
 ## STEP 7 — VERIFY LOG (15 sec)
 
-Open:
+Open file:
+
+```bash
 logs/action_logs.json
+```
 
 Show:
 
-* trace_id
-* action_type
-* timestamp
-
+- trace_id  
+- action_type  
+- timestamp  
 
 "All actions are logged with full traceability."
 
@@ -105,9 +107,8 @@ Show:
 
 Match:
 
-* trace_id in dashboard
-* trace_id in logs
-
+- trace_id in dashboard  
+- trace_id in logs  
 
 "The same trace_id flows across validation, analysis, and action logging."
 
