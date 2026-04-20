@@ -7,12 +7,12 @@ from error_handler import error_response
 
 
 # -----------------------------
-# ZONE DETECTION
+# ZONE DETECTION (FIXED SAFE)
 # -----------------------------
 def detect_zone(lat, lon):
     try:
-        if lat is None or lon is None:
-            return "Unknown"
+        lat = float(lat)
+        lon = float(lon)
 
         if lat > 23:
             return "North"
@@ -31,9 +31,6 @@ def detect_zone(lat, lon):
 def analyze_signal(signal):
 
     try:
-        # -----------------------------
-        # INPUT VALIDATION
-        # -----------------------------
         if not isinstance(signal, dict):
             return error_response("Invalid signal input (must be dict)")
 
@@ -50,9 +47,6 @@ def analyze_signal(signal):
 
         feature = str(signal.get("feature_type", "")).lower()
 
-        # -----------------------------
-        # DEFAULT VALUES
-        # -----------------------------
         risk_level = "LOW"
         anomaly_score = 0.2
         anomaly_type = "NORMAL"
@@ -109,9 +103,6 @@ def analyze_signal(signal):
                 anomaly_type = "HEAVY_TRAFFIC"
                 explanation = "Traffic density increasing"
 
-        # -----------------------------
-        # UNKNOWN FEATURE
-        # -----------------------------
         else:
             anomaly_type = "UNKNOWN_FEATURE"
             explanation = "Feature type not recognized"
@@ -136,7 +127,7 @@ def analyze_signal(signal):
         }
 
         # -----------------------------
-        # LOGGING (FIXED TIME)
+        # LOGGING
         # -----------------------------
         try:
             log_entry = {
@@ -147,7 +138,7 @@ def analyze_signal(signal):
             }
 
             with open("logs/anomaly_logs.json", "a") as f:
-                f.write(json.dumps(log_entry) + "\n")
+                f.write(json.dumps(log_entry, default=str) + "\n")
 
         except:
             pass
@@ -159,18 +150,14 @@ def analyze_signal(signal):
 
 
 # =========================================================
-# 🔹 MULTI-SIGNAL ANALYSIS
+# 🔹 MULTI-SIGNAL ANALYSIS (🔥 FIXED SAFE VERSION)
 # =========================================================
 def analyze_patterns(outputs):
 
     try:
-        # -----------------------------
-        # INPUT VALIDATION
-        # -----------------------------
         if not isinstance(outputs, list):
             return error_response("Invalid input (outputs must be list)")
 
-        # ✅ FIX: DO NOT THROW ERROR
         if len(outputs) == 0:
             return {
                 "pattern_id": "PATTERN_NONE",
@@ -185,13 +172,13 @@ def analyze_patterns(outputs):
         anomaly_count = 0
         affected_zones = set()
         linked_traces = []
-
         zone_frequency = defaultdict(int)
 
-        # -----------------------------
-        # PROCESS
-        # -----------------------------
         for o in outputs:
+
+            # 🔥 CRITICAL FIX
+            if not isinstance(o, dict):
+                continue
 
             risk = o.get("risk_level")
             trace_id = o.get("trace_id")
@@ -201,7 +188,8 @@ def analyze_patterns(outputs):
 
                 anomaly_count += 1
 
-                if trace_id:
+                # 🔥 SAFE TRACE
+                if isinstance(trace_id, str):
                     linked_traces.append(trace_id)
 
                 zone = detect_zone(
@@ -209,8 +197,13 @@ def analyze_patterns(outputs):
                     o.get("longitude")
                 )
 
-                affected_zones.add(zone)
-                zone_frequency[zone] += 1
+                # 🔥 SAFE SET ADD (FIX FOR YOUR ERROR)
+                if isinstance(zone, str):
+                    affected_zones.add(zone)
+                    zone_frequency[zone] += 1
+                else:
+                    affected_zones.add("Unknown")
+                    zone_frequency["Unknown"] += 1
 
         dominant_zone = (
             max(zone_frequency, key=zone_frequency.get)
@@ -258,7 +251,7 @@ def analyze_patterns(outputs):
         }
 
         # -----------------------------
-        # LOGGING (FIXED TIME)
+        # LOGGING
         # -----------------------------
         try:
             log_entry = {
@@ -269,7 +262,7 @@ def analyze_patterns(outputs):
             }
 
             with open("logs/pattern_logs.json", "a") as f:
-                f.write(json.dumps(log_entry) + "\n")
+                f.write(json.dumps(log_entry, default=str) + "\n")
 
         except:
             pass
