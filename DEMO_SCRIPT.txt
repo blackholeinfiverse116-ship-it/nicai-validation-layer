@@ -1,14 +1,14 @@
-# NICAI DEMO SCRIPT (FINAL — 2–3 MIN)
+# NICAI DEMO SCRIPT 
 
 ---
 
-## INTRO (5–7 sec)
+## INTRO 
 
 "NICAI is a deterministic intelligence system that processes real-world data and generates traceable intelligence outputs without taking decisions."
 
 ---
 
-## STEP 1 — RAW DATA (10 sec)
+## STEP 1 — RAW DATA 
 
 Show:
 
@@ -21,7 +21,7 @@ Say:
 
 ---
 
-## STEP 2 — RUN SYSTEM (15 sec)
+## STEP 2 — RUN SYSTEM 
 
 Run:
 
@@ -39,7 +39,7 @@ Say:
 
 ---
 
-## STEP 3 — VALIDATION + ANALYSIS (20 sec)
+## STEP 3 — VALIDATION + ANALYSIS 
 
 Show console:
 
@@ -51,7 +51,7 @@ Say:
 
 ---
 
-## STEP 4 — PATTERN DETECTION (15 sec)
+## STEP 4 — PATTERN DETECTION 
 
 Show:
 
@@ -63,7 +63,7 @@ Say:
 
 ---
 
-## STEP 5 — DASHBOARD (20 sec)
+## STEP 5 — DASHBOARD 
 
 Open:
 
@@ -83,7 +83,7 @@ Say:
 
 ---
 
-## STEP 6 — TRIGGER ACTION (15 sec)
+## STEP 6 — TRIGGER ACTION 
 
 Click any button:
 
@@ -97,7 +97,7 @@ Say:
 
 ---
 
-## STEP 7 — VERIFY LOG (15 sec)
+## STEP 7 — VERIFY LOG 
 
 Open:
 
@@ -117,7 +117,7 @@ Say:
 
 ---
 
-## STEP 8 — TRACE CONTINUITY (10 sec)
+## STEP 8 — TRACE CONTINUITY 
 
 Match:
 
@@ -130,6 +130,6 @@ Say:
 
 ---
 
-## CLOSING (5 sec)
+## CLOSING 
 
 "NICAI ensures deterministic processing, full traceability, and safe intelligence-driven workflows."
