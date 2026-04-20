@@ -17,10 +17,10 @@ This performs:
 3. Validation  
 4. Intelligence analysis  
 5. Pattern detection  
-6. API readiness  
-7. Dashboard instructions  
+6. API startup  
+7. Dashboard access  
 
-This ensures a **single, clean demo flow**.
+Ensures a **single, clean, repeatable demo flow**.
 
 ---
 
@@ -47,14 +47,16 @@ API Layer (FastAPI)
    ↓
 Dashboard Interface
    ↓
-Action Logging
+Action Routing (Simulation)
+   ↓
+Logging System
 ```
 
 NICAI does NOT take decisions.
 
 It only produces:
-- intelligence outputs
-- structured action signals
+- intelligence outputs  
+- structured recommendation signals  
 
 ---
 
@@ -78,13 +80,14 @@ data/
 
 REVIEW_PACKET.md
 TESTING_PACKET.md
+README.md
 ```
 
 ---
 
-# 4. Failure Handling (Critical Fix)
+# 4. Failure Handling (Critical)
 
-All errors are handled through:
+All failures are handled through:
 
 ```
 error_handler.py
@@ -117,18 +120,18 @@ Handled cases:
 
 # 5. Input Validation Gate (Hardening Layer)
 
-Before processing:
+Before validation:
 
 System ensures:
 
-- input is valid JSON/dict/list  
+- input is valid JSON / dict / list  
 - required fields exist  
 - no null critical values  
 
 If invalid:
 
 → pipeline stops early  
-→ returns structured error  
+→ structured error returned  
 
 ---
 
@@ -144,7 +147,6 @@ Responsibilities:
 
 - schema validation  
 - dataset verification  
-- feature-based checks  
 - trace_id generation  
 
 Output:
@@ -169,7 +171,7 @@ File:
 sanskar_engine.py
 ```
 
-Performs deterministic analysis:
+Deterministic anomaly detection:
 
 | Condition | Risk Level |
 |----------|-----------|
@@ -177,21 +179,22 @@ Performs deterministic analysis:
 | Elevated | MEDIUM    |
 | Extreme  | HIGH      |
 
-Output:
+### Output Contract (LOCKED)
 
 ```json
 {
   "risk_level": "HIGH",
-  "anomaly_score": 0.9,
   "anomaly_type": "TEMPERATURE_SPIKE",
   "explanation": "...",
+  "temporal_context": "current_window",
+  "confidence": 0.9,
   "recommendation_signal": "eligible_for_escalation"
 }
 ```
 
 ---
 
-# 8. TANTRA Compliance (MANDATORY)
+# 8. TANTRA Compliance (Mandatory)
 
 NICAI does NOT take decisions.
 
@@ -210,7 +213,7 @@ Removed:
 
 # 9. Multi-Signal Pattern Detection
 
-Handled inside:
+Handled in:
 
 ```
 sanskar_engine.py
@@ -228,7 +231,7 @@ Output:
 {
   "pattern_id": "PATTERN_xxx",
   "anomaly_count": 3,
-  "affected_zones": ["Zone_A"],
+  "affected_zones": ["North"],
   "pattern_type": "REPEATED_ANOMALY",
   "pattern_summary": "...",
   "severity_trend": "STABLE"
@@ -247,19 +250,42 @@ dashboard.py
 
 Features:
 
-- displays signals
-- shows risk & anomaly
-- action buttons
+- signal table  
+- anomaly insights  
+- risk levels  
+- action buttons  
+- pattern summary  
 
 Fail-safe behavior:
-
-If any failure occurs:
 
 ```
 No data / invalid input
 ```
 
 System NEVER crashes or shows blank screen.
+
+---
+
+```
+
+Purpose:
+
+- simulate routing of actions  
+- no execution logic  
+
+Mapping:
+
+| Risk Level | Action | Target Role |
+|-----------|--------|-------------|
+| HIGH      | eligible_for_escalation | authority |
+| MEDIUM    | requires_review | operator |
+| LOW       | monitor | system |
+
+All actions are:
+
+- logged  
+- traceable  
+- non-executable  
 
 ---
 
@@ -273,35 +299,14 @@ main.py
 
 Endpoints:
 
-### Validate
-```
-POST /validate
-```
-
-### Full Pipeline
-```
-POST /pipeline
-```
-
-### NICAI Output
-```
-POST /nicai/evaluate
-```
-
-### Batch Run
-```
-GET /run
-```
-
-### Dashboard
-```
-GET /dashboard
-```
-
-### Action Trigger
-```
-POST /action
-```
+| Endpoint | Method | Description |
+|----------|--------|------------|
+| `/validate` | POST | Validate signal |
+| `/pipeline` | POST | Validation + analysis |
+| `/nicai/evaluate` | POST | Final intelligence |
+| `/run` | GET | Batch processing |
+| `/dashboard` | GET | UI dashboard |
+| `/action` | POST | Action logging |
 
 ---
 
@@ -315,10 +320,10 @@ logs/
 
 Files:
 
-- action_logs.json  
+- validation_logs.json  
 - anomaly_logs.json  
 - pattern_logs.json  
-- validation_logs.json  
+- action_logs.json  
 
 Each log entry:
 
@@ -348,26 +353,11 @@ Signal
  → Action Log
 ```
 
-Ensures full trace tracking.
+Ensures complete trace tracking across system.
 
 ---
 
-# 14. Demo Flow (2–3 min script)
-
-Step 1 — Show dataset  
-Step 2 — Show signal conversion  
-Step 3 — Run validation  
-Step 4 — Show anomaly detection  
-Step 5 — Show pattern detection  
-Step 6 — Open dashboard  
-Step 7 — Trigger action  
-Step 8 — Show logs + trace_id  
-
----
-
-# 15. Deterministic Guarantee
-
-NICAI ensures:
+# 14. Deterministic Guarantee
 
 ```
 Same Input → Same Output
@@ -383,14 +373,16 @@ No randomness used.
 
 ---
 
-# 16. Final Outcome
+# 15. Final Outcome
 
 NICAI is now:
 
+- ✅ Independent system  
 - ✅ Crash-free  
 - ✅ Failure-safe  
+- ✅ Deterministic  
+- ✅ Fully traceable  
 - ✅ Demo-ready  
-- ✅ Fully deterministic  
 - ✅ TANTRA-aligned  
 
 ---
@@ -402,7 +394,7 @@ NICAI is a **stable, unified intelligence system** that:
 - processes real-world signals  
 - detects anomalies  
 - identifies patterns  
-- provides structured recommendations  
+- generates structured recommendation signals  
 - maintains full traceability  
 
-It is now ready for **controlled demo and evaluation**.
+Ready for **demo, evaluation, and controlled deployment**.
