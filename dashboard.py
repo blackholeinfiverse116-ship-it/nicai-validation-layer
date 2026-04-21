@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 import json
 import html
+import os
+import traceback
 
 from validator import validate_signal
 from samachar_input_adapter import load_data, convert_to_signals
@@ -10,15 +12,27 @@ from sanskar_engine import analyze_signal, analyze_patterns
 from error_handler import error_response
 
 app = FastAPI()
+os.makedirs("logs", exist_ok=True)
 
 
 # -------------------------------
-# SAFE STRING (XSS PROTECTION)
+# SAFE STRING
 # -------------------------------
 def safe(v):
-    if isinstance(v, (dict, list)):
-        return html.escape(json.dumps(v, default=str))
-    return html.escape(str(v))
+    try:
+        return html.escape(str(v))
+    except:
+        return "N/A"
+
+
+# -------------------------------
+# SAFE FLOAT
+# -------------------------------
+def to_float(v):
+    try:
+        return float(v)
+    except:
+        return 0.0
 
 
 # -------------------------------
@@ -26,48 +40,82 @@ def safe(v):
 # -------------------------------
 def log_data(filename, log_type, data):
     try:
-        log_entry = {
-            "trace_id": data.get("trace_id", "N/A"),
-            "timestamp": datetime.now(UTC).isoformat(),
-            "type": log_type,
-            "data": data
-        }
         with open(f"logs/{filename}", "a") as f:
-            f.write(json.dumps(log_entry, default=str) + "\n")
+            f.write(json.dumps({
+                "trace_id": str(data.get("trace_id", "N/A")),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "type": log_type,
+                "data": data
+            }, default=str) + "\n")
     except:
         pass
 
 
 # -------------------------------
-# ✅ FIXED ZONE DETECTION (MATCHES ENGINE)
+# ZONE DETECTION
 # -------------------------------
-def detect_zone(signal):
+def detect_zone(lat):
     try:
-        lat = float(signal.get("latitude", 0))
-
+        lat = float(lat)
         if lat > 23:
             return "North"
         elif lat > 20:
             return "Central"
         else:
             return "South"
-
     except:
         return "Unknown"
+
+
+# -------------------------------
+# ACTION ROUTER
+# -------------------------------
+@app.post("/action")
+def action_router(data: dict):
+    try:
+        if not isinstance(data, dict):
+            return error_response("Invalid input")
+
+        risk = str(data.get("risk_level", "LOW"))
+
+        if risk == "HIGH":
+            target_role = "authority"
+        elif risk == "MEDIUM":
+            target_role = "operator"
+        else:
+            target_role = "monitor"
+
+        action_payload = {
+            "trace_id": str(data.get("trace_id")),
+            "action_type": str(data.get("action_type")),
+            "target_role": target_role,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "context": {}
+        }
+
+        log_data("action_logs.json", "ACTION", action_payload)
+
+        return {"status": "SUCCESS", "action": action_payload}
+
+    except Exception as e:
+        return error_response(str(e))
 
 
 # -------------------------------
 # DASHBOARD
 # -------------------------------
 @app.get("/", response_class=HTMLResponse)
+@app.get("/dashboard", response_class=HTMLResponse)
 def dashboard():
+
+    print("🔥 DASHBOARD NEW VERSION RUNNING")  # DEBUG
 
     try:
         weather, aqi = load_data()
         signals = convert_to_signals(weather, aqi)
 
         if not isinstance(signals, list) or not signals:
-            return HTMLResponse("<h3>No data / invalid input</h3>")
+            return HTMLResponse("<h3>No data</h3>")
 
         rows = ""
         processed_outputs = []
@@ -78,55 +126,47 @@ def dashboard():
                 continue
 
             validation = validate_signal(signal)
-
-            # 🔴 SHOW INVALID
             if validation.get("status") == "ERROR":
-                rows += f"""
-                <tr style="background-color:#ffcccc;">
-                    <td>{safe(signal.get("signal_id"))}</td>
-                    <td>Unknown</td>
-                    <td>INVALID</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>Validation Failed</td>
-                    <td>-</td>
-                </tr>
-                """
                 continue
 
             analysis = analyze_signal(signal)
-
-            if not isinstance(analysis, dict) or analysis.get("status") == "ERROR":
+            if not isinstance(analysis, dict):
                 continue
 
-            zone = detect_zone(signal)
-            risk = analysis.get("risk_level", "LOW")
+            lat = to_float(signal.get("latitude"))
+            lon = to_float(signal.get("longitude"))
+            zone = detect_zone(lat)
 
-            # ✅ ACTION MAPPING (CORRECT)
+            risk = str(analysis.get("risk_level", "LOW"))
+
+            # ✅ Recommended Step
             if risk == "HIGH":
-                action_label = "Eligible for Escalation"
-                action_type = "eligible_for_escalation"
+                step = "Escalation recommended"
+                action_label = "Escalate"
+                action_type = "ESCALATE"
                 row_color = "#ffe6e6"
             elif risk == "MEDIUM":
-                action_label = "Requires Review"
-                action_type = "requires_review"
+                step = "Needs review"
+                action_label = "Review"
+                action_type = "REVIEW"
                 row_color = "#fff5cc"
             else:
+                step = "Monitor"
                 action_label = "Monitor"
-                action_type = "monitor"
+                action_type = "MONITOR"
                 row_color = ""
 
-            # pattern input
+            trace_id = str(validation.get("trace_id"))
+
             processed_outputs.append({
-                "signal_id": signal.get("signal_id"),
-                "trace_id": validation.get("trace_id"),
+                "signal_id": str(signal.get("signal_id")),
+                "trace_id": trace_id,
                 "risk_level": risk,
-                "latitude": signal.get("latitude"),
-                "longitude": signal.get("longitude"),
-                "anomaly_score": analysis.get("anomaly_score", 0)
+                "latitude": lat,
+                "longitude": lon,
+                "anomaly_score": float(analysis.get("anomaly_score", 0))
             })
 
-            # logging
             log_data("validation_logs.json", "VALIDATION", validation)
             log_data("anomaly_logs.json", "ANALYSIS", analysis)
 
@@ -138,34 +178,25 @@ def dashboard():
                 <td>{safe(risk)}</td>
                 <td>{safe(analysis.get("anomaly_type"))}</td>
                 <td>{safe(analysis.get("explanation"))}</td>
+                <td>{safe(step)}</td>
                 <td>
-                    <button onclick="sendAction('{safe(validation.get("trace_id"))}','{action_type}')">
+                    <button onclick="sendAction('{trace_id}','{action_type}','{risk}')">
                         {action_label}
                     </button>
                 </td>
             </tr>
             """
 
-        # -------------------------------
-        # PATTERN ANALYSIS
-        # -------------------------------
+        # Pattern
         try:
-            pattern = analyze_patterns(processed_outputs) if processed_outputs else {}
-        except:
-            pattern = {}
+            pattern = analyze_patterns(processed_outputs)
+        except Exception as e:
+            pattern = {"error": str(e)}
 
-        pattern_id = safe(pattern.get("pattern_id", "N/A"))
-        pattern_type = safe(pattern.get("pattern_type", "NONE"))
-        pattern_summary = safe(pattern.get("pattern_summary", "No data"))
-        pattern_count = safe(pattern.get("anomaly_count", 0))
+        log_data("pattern_logs.json", "PATTERN", pattern)
 
-        # -------------------------------
-        # OBSERVABILITY
-        # -------------------------------
         total_signals = len(signals)
-        total_anomalies = len(
-            [o for o in processed_outputs if o["risk_level"] != "LOW"]
-        )
+        total_anomalies = len([o for o in processed_outputs if o["risk_level"] != "LOW"])
 
         try:
             with open("logs/action_logs.json") as f:
@@ -173,62 +204,55 @@ def dashboard():
         except:
             action_count = 0
 
-        # -------------------------------
-        # HTML
-        # -------------------------------
         html_content = f"""
         <html>
         <head>
             <title>NICAI Dashboard</title>
-
             <script>
-            async function sendAction(trace_id, action_type) {{
+            async function sendAction(trace_id, action_type, risk) {{
                 await fetch("/action", {{
                     method: "POST",
                     headers: {{"Content-Type": "application/json"}},
                     body: JSON.stringify({{
                         trace_id: trace_id,
-                        action_type: action_type
+                        action_type: action_type,
+                        risk_level: risk
                     }})
                 }});
-                alert("Action logged successfully");
+                alert("Action logged");
                 location.reload();
             }}
             </script>
         </head>
 
         <body>
+        <h2>NICAI Dashboard</h2>
 
-        <h2>NICAI Intelligence Dashboard</h2>
-
-        <h3>System Observability</h3>
         <p>Total Signals: {total_signals}</p>
         <p>Total Anomalies: {total_anomalies}</p>
         <p>Actions Logged: {action_count}</p>
 
-        <h3>Pattern</h3>
-        <p>ID: {pattern_id}</p>
-        <p>Count: {pattern_count}</p>
-        <p>Type: {pattern_type}</p>
-        <p>Summary: {pattern_summary}</p>
-
-        <h3>Signals</h3>
-
         <table border="1" cellpadding="5">
         <tr>
-            <th>ID</th><th>Zone</th><th>Status</th>
-            <th>Risk</th><th>Type</th><th>Explanation</th><th>Action</th>
+            <th>ID</th>
+            <th>Zone</th>
+            <th>Status</th>
+            <th>Risk</th>
+            <th>Type</th>
+            <th>Explanation</th>
+            <th>Recommended Step</th>
+            <th>Action</th>
         </tr>
 
         {rows}
 
         </table>
-
         </body>
         </html>
         """
 
         return HTMLResponse(content=html_content)
 
-    except Exception:
-        return HTMLResponse("<h3>No data / invalid input</h3>")
+    except Exception as e:
+        print(traceback.format_exc())
+        return HTMLResponse(f"<h3>Error: {str(e)}</h3>")
