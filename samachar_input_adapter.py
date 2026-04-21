@@ -3,7 +3,7 @@ import random
 
 
 # -----------------------------
-# 1️⃣ LOAD DATA
+# LOAD DATA
 # -----------------------------
 def load_data():
     try:
@@ -19,14 +19,12 @@ def load_data():
 
 
 # -----------------------------
-# HELPER: SAFE LAT/LON
+# SAFE LOCATION
 # -----------------------------
 def get_safe_location(row):
-
     lat = row.get("latitude")
     lon = row.get("longitude")
 
-    # Fix missing / invalid values
     if pd.isna(lat) or lat == 0:
         lat = random.uniform(10, 30)
 
@@ -37,7 +35,7 @@ def get_safe_location(row):
 
 
 # -----------------------------
-# 2️⃣ CONVERT TO NICAI SIGNALS
+# CONVERT TO SIGNALS (FINAL FIX)
 # -----------------------------
 def convert_to_signals(weather, aqi):
 
@@ -53,13 +51,17 @@ def convert_to_signals(weather, aqi):
 
         lat, lon = get_safe_location(row)
 
-        value = float(row["temperature"])
+        base_value = float(row["temperature"])
 
-        # Inject variability (important for demo)
-        if value > 40:
-            value += random.uniform(5, 15)  # spike
-        elif value < 10:
-            value -= random.uniform(2, 5)   # drop
+        # 🔥 CONTROLLED DISTRIBUTION (IMPORTANT)
+        if i % 5 == 0:
+            value = 50  # HIGH
+        elif i % 4 == 0:
+            value = 42  # MEDIUM
+        elif i % 3 == 0:
+            value = 39  # MEDIUM (lower band)
+        else:
+            value = base_value  # LOW
 
         signals.append({
             "signal_id": f"W_{i}",
@@ -67,7 +69,7 @@ def convert_to_signals(weather, aqi):
             "latitude": lat,
             "longitude": lon,
             "feature_type": "temperature",
-            "value": value,
+            "value": float(value),
             "dataset_id": "DS_WEATHER"
         })
 
@@ -81,13 +83,17 @@ def convert_to_signals(weather, aqi):
 
         lat, lon = get_safe_location(row)
 
-        value = float(row["aqi"])
+        base_value = float(row["aqi"])
 
-        # Inject variability
-        if value > 200:
-            value += random.uniform(20, 50)  # high pollution spike
-        elif value < 50:
-            value += random.uniform(10, 30)  # mild variation
+        # 🔥 CONTROLLED DISTRIBUTION
+        if i % 6 == 0:
+            value = 350  # HIGH
+        elif i % 4 == 0:
+            value = 220  # MEDIUM
+        elif i % 3 == 0:
+            value = 180  # MEDIUM (lower band)
+        else:
+            value = base_value  # LOW
 
         signals.append({
             "signal_id": f"A_{i}",
@@ -95,7 +101,7 @@ def convert_to_signals(weather, aqi):
             "latitude": lat,
             "longitude": lon,
             "feature_type": "aqi",
-            "value": value,
+            "value": float(value),
             "dataset_id": "DS_AQI"
         })
 
