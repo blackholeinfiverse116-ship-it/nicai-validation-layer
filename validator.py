@@ -2,9 +2,10 @@ from schemas import required_fields
 from dataset_registry import get_dataset
 from utils import generate_trace_id, validate_output_schema
 
+
 # -------------------------------
 # SAFE OPTIONAL IMPORTS
-# ------------------------------- 
+# -------------------------------
 try:
     from bucket_emitter import emit_bucket_artifact
     from telemetry_emitter import emit_telemetry
@@ -14,7 +15,7 @@ except ImportError:
 
 
 # -------------------------------
-# STANDARD ERROR FORMAT (FIX)
+# STANDARD ERROR FORMAT
 # -------------------------------
 def build_error(reason, trace_id=None, signal=None):
     return {
@@ -27,29 +28,35 @@ def build_error(reason, trace_id=None, signal=None):
 
 
 # -------------------------------
+# SAFE TRACE ID
+# -------------------------------
+def safe_trace_id(signal):
+    try:
+        return generate_trace_id(signal)
+    except:
+        return "TRACE_UNKNOWN"
+
+
+# -------------------------------
 # VALIDATE SINGLE SIGNAL
 # -------------------------------
 def validate_signal(signal):
 
     try:
         # -------------------------------
-        # 0️⃣ BASIC CHECK
+        # BASIC CHECK
         # -------------------------------
         if not isinstance(signal, dict):
             return build_error("Invalid signal format")
 
-        trace_id = generate_trace_id(signal)
+        trace_id = safe_trace_id(signal)
 
         # -------------------------------
-        # 1️⃣ REQUIRED FIELDS
+        # REQUIRED FIELDS CHECK
         # -------------------------------
         for field in required_fields:
             if field not in signal or signal.get(field) in [None, ""]:
-                result = build_error(
-                    f"Missing field: {field}",
-                    trace_id,
-                    signal
-                )
+                result = build_error(f"Missing field: {field}", trace_id, signal)
 
                 validate_output_schema(result)
                 emit_bucket_artifact(result)
@@ -57,17 +64,18 @@ def validate_signal(signal):
                 return result
 
         # -------------------------------
-        # 2️⃣ DATASET CHECK
+        # SAFE DATASET ID (🔥 FIX)
         # -------------------------------
         dataset_id = signal.get("dataset_id")
+
+        if not isinstance(dataset_id, (str, int)):
+            result = build_error("Invalid dataset_id type", trace_id, signal)
+            return result
+
         dataset = get_dataset(dataset_id)
 
-        if dataset is None:
-            result = build_error(
-                "Dataset not registered",
-                trace_id,
-                signal
-            )
+        if not isinstance(dataset, dict):
+            result = build_error("Dataset not registered", trace_id, signal)
 
             validate_output_schema(result)
             emit_bucket_artifact(result)
@@ -75,7 +83,7 @@ def validate_signal(signal):
             return result
 
         # -------------------------------
-        # 3️⃣ DATASET STATUS
+        # DATASET STATUS CHECK
         # -------------------------------
         if dataset.get("status") != "active":
             result = {
@@ -92,7 +100,7 @@ def validate_signal(signal):
             return result
 
         # -------------------------------
-        # 4️⃣ FEATURE VALIDATION
+        # FEATURE VALIDATION
         # -------------------------------
         value = signal.get("value")
         feature = str(signal.get("feature_type", "")).lower()
@@ -183,9 +191,11 @@ def validate_batch(signals):
                 "trace_id": None
             }
 
-        signals = sorted(signals, key=lambda x: x.get("signal_id", ""))
+        safe_signals = [s for s in signals if isinstance(s, dict)]
 
-        results = [validate_signal(s) for s in signals]
+        safe_signals.sort(key=lambda x: str(x.get("signal_id", "")))
+
+        results = [validate_signal(s) for s in safe_signals]
 
         return {"results": results}
 
@@ -210,7 +220,7 @@ def get_validated_signals(signals):
 
         return [
             r for r in batch.get("results", [])
-            if r.get("status") in ["VALID", "FLAG"]
+            if isinstance(r, dict) and r.get("status") in ["VALID", "FLAG"]
         ]
 
     except Exception as e:
