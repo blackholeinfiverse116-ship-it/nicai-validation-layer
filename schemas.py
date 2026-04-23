@@ -3,7 +3,7 @@ required_fields = [
     "timestamp",
     "latitude",
     "longitude",
-    "feature_type",   # ✅ FIXED
+    "feature_type",   
     "value",
     "dataset_id"
 ]
