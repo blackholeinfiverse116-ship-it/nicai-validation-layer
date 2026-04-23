@@ -6,7 +6,7 @@ import json
 import os
 import traceback
 
-from validator import validate_signal
+from validator import validate_signal 
 from samachar_input_adapter import load_data, convert_to_signals
 from error_handler import error_response
 from sanskar_engine import analyze_signal, analyze_patterns
