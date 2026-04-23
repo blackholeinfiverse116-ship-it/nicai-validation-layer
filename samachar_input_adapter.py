@@ -11,7 +11,7 @@ def load_data():
         aqi = pd.read_csv("data/clean_aqi.csv")
 
         print("✅ Data Loaded Successfully")
-        return weather, aqi
+        return weather, aqi 
 
     except Exception as e:
         print("❌ Error loading data:", e)
