@@ -4,7 +4,7 @@ import json
 # -------------------------------
 # SAFE STRING CONVERTER
 # -------------------------------
-def to_safe_string(value):
+def to_safe_string(value): 
     try:
         if isinstance(value, (dict, list)):
             return json.dumps(value, sort_keys=True)
