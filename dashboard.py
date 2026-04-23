@@ -143,12 +143,12 @@ def dashboard():
             if risk == "HIGH":
                 step = "Escalation recommended"
                 action_label = "Escalate"
-                action_type = "ESCALATE"
+                action_type = "eligible_for_escalation"
                 row_color = "#ffe6e6"
             elif risk == "MEDIUM":
                 step = "Needs review"
                 action_label = "Review"
-                action_type = "REVIEW"
+                action_type = "requires_review"
                 row_color = "#fff5cc"
             else:
                 step = "Monitor"
