@@ -1,52 +1,47 @@
-# NICAI – TESTING PACKET (FINAL)
+# NICAI – TESTING PACKET (FINAL DEMO-SAFE VERSION)
 
-Project: NICAI – Networked Intelligence & Context Analysis Interface  
-Developer: Ankita Prajapati  
-Testing Authority: Vinayak Tiwari  
-Testing Protocol: BHIV Universal Testing Protocol  
+Project: NICAI – Networked Intelligence & Context Analysis Interface
+Developer: Ankita Prajapati
+Testing Authority: Vinayak Tiwari
+Protocol: BHIV Universal Testing Protocol
 
 ---
 
-## 1. SYSTEM OVERVIEW
+# 1. SYSTEM OVERVIEW
 
 NICAI is a **deterministic intelligence system** that processes real-world datasets and produces structured anomaly intelligence outputs.
 
-NICAI does NOT execute decisions.  
-It only generates:
+NICAI does NOT execute decisions.
 
-- interpretable intelligence  
-- anomaly insights  
-- structured action signals  
+It generates:
+
+* anomaly insights
+* risk classification
+* recommendation signals
+* traceable action logs
 
 Pipeline:
 
-```
 Data → Signal Conversion → Validation → Intelligence → Pattern Detection → Dashboard → Action Logging
-```
 
 ---
 
-## 2. REAL DATA INGESTION
+# 2. REAL DATA INGESTION
 
-NICAI uses real-world datasets:
+Datasets used:
 
-```
-data/clean_weather.csv  
+data/clean_weather.csv
 data/clean_aqi.csv
-```
 
-### Weather Dataset
-### AQI Dataset
+System reads real-world environmental data and converts into signals.
 
 ---
 
-## 3. SIGNAL GENERATION
+# 3. SIGNAL GENERATION
 
-Data is converted into standardized NICAI signals using:
+Handled by:
 
-```
 samachar_input_adapter.py
-```
 
 Example signal:
 
@@ -57,47 +52,42 @@ Example signal:
   "latitude": 19.0760,
   "longitude": 72.8777,
   "value": 48.7,
-  "dataset_id": "weather"
+  "dataset_id": "weather",
+  "feature_type": "temperature"
 }
 ```
 
 ---
 
-## 4. TRACEABILITY
+# 4. TRACEABILITY TEST
 
-Each signal receives a deterministic `trace_id`.
+Each signal generates deterministic `trace_id`.
 
-Generation:
-```
-trace_id = SHA256(signal_id + timestamp)
-```
+Flow:
 
-Trace flow:
-```
-Validation → Analysis → Pattern → Dashboard → Action Logs
-```
+Signal → Validation → Analysis → Pattern → Dashboard → Action Log
 
-This ensures **end-to-end traceability**.
+Validation:
+
+* trace_id must remain SAME across all layers
+* trace_id must appear in logs
 
 ---
 
-## 5. VALIDATION LAYER TESTING
+# 5. VALIDATION LAYER TESTING
 
-File:
-```
-validator.py
-```
+File: validator.py
 
 ### Test Cases
 
-| Case | Input | Expected Output |
-|------|------|----------------|
-| Missing field | No timestamp | ERROR response |
-| Invalid dataset | Unknown dataset_id | ERROR response |
-| Wrong type | value = string | ERROR response |
-| Valid signal | Proper data | VALID / FLAG |
+| Case            | Input            | Expected     |
+| --------------- | ---------------- | ------------ |
+| Missing field   | No timestamp     | ERROR        |
+| Invalid dataset | Wrong dataset_id | ERROR        |
+| Wrong type      | value = string   | ERROR        |
+| Valid signal    | Correct input    | VALID / FLAG |
 
-### Expected Error Format
+### Expected Output
 
 ```json
 {
@@ -107,24 +97,23 @@ validator.py
 }
 ```
 
+✔ System must NEVER crash
+
 ---
 
-## 6. INTELLIGENCE ENGINE TESTING
+# 6. INTELLIGENCE ENGINE TESTING
 
-File:
-```
-sanskar_engine.py
-```
+File: sanskar_engine.py
 
 ### Test Cases
 
-| Condition | Expected Result |
-|----------|----------------|
-| Normal value | LOW risk |
-| Elevated value | MEDIUM risk |
-| Extreme value | HIGH risk |
+| Condition | Expected Risk |
+| --------- | ------------- |
+| Normal    | LOW           |
+| Elevated  | MEDIUM        |
+| Extreme   | HIGH          |
 
-Example output:
+Example:
 
 ```json
 {
@@ -136,81 +125,94 @@ Example output:
 }
 ```
 
+✔ Deterministic output (same input → same output)
+
 ---
 
-## 7. MULTI-SIGNAL PATTERN TESTING
+# 7. PATTERN DETECTION TESTING
 
-Function:
-```
-analyze_patterns()
-```
+Function: analyze_patterns()
 
 ### Test Cases
 
-| Scenario | Expected |
-|--------|----------|
-| No anomalies | NO_PATTERN |
-| Few anomalies | STABLE pattern |
-| Cluster anomalies | REPEATED_ANOMALY |
+| Scenario           | Expected         |
+| ------------------ | ---------------- |
+| No anomalies       | NO_PATTERN       |
+| Few anomalies      | STABLE           |
+| Multiple anomalies | REPEATED_ANOMALY |
+| Cluster            | CLUSTER_ANOMALY  |
 
 Example:
 
 ```json
 {
   "pattern_id": "PATTERN_xxx",
-  "anomaly_count": 3,
+  "anomaly_count": 5,
   "affected_zones": ["North"],
-  "pattern_type": "REPEATED_ANOMALY",
-  "severity_trend": "STABLE"
+  "pattern_type": "CLUSTER_ANOMALY",
+  "severity_trend": "INCREASING"
 }
 ```
 
 ---
 
-## 8. DASHBOARD TESTING
+# 8. API ENDPOINT TESTING (LOCKED)
 
-Start server:
+Allowed endpoints:
 
-```
-uvicorn main:app --reload
-```
+/nicai/evaluate
+/dashboard
+/action
 
-Open:
+### Test Cases
 
-```
-http://127.0.0.1:8000/
-```
+| Endpoint        | Test          | Expected          |
+| --------------- | ------------- | ----------------- |
+| /nicai/evaluate | valid signal  | structured output |
+| /nicai/evaluate | invalid input | ERROR             |
+| /action         | valid request | SUCCESS           |
+| /dashboard      | open          | UI loads          |
 
-### Validate:
-
-- No crashes  
-- Data visible  
-- Buttons working  
-- Safe fallback on failure  
-
-### Failure Case:
-
-If API fails:
-```
-No data / invalid input
-```
+✔ No unused endpoints should be tested
 
 ---
 
-## 9. ACTION ROUTING TEST
+# 9. DASHBOARD TESTING
+
+Open:
+
+http://127.0.0.1:8000/dashboard
+
+### Validate:
+
+* table loads
+* risk levels visible
+* anomaly type shown
+* explanation visible
+* recommended step visible
+* action button works
+
+### Failure Case:
+
+No data → safe message displayed
+
+✔ Dashboard must NEVER crash
+
+---
+
+# 10. ACTION ROUTING TEST
 
 Endpoint:
 
-```
 POST /action
-```
 
 ### Request:
 
 ```json
 {
-  "trace_id": "...",
-  "action_type": "eligible_for_escalation"
+  "trace_id": "TEST123",
+  "action_type": "ESCALATE",
+  "risk_level": "HIGH"
 }
 ```
 
@@ -219,129 +221,145 @@ POST /action
 ```json
 {
   "status": "SUCCESS",
-  "action": {...}
+  "action": {
+    "trace_id": "TEST123",
+    "action_type": "ESCALATE",
+    "target_role": "authority",
+    "timestamp": "...",
+    "context": {}
+  }
 }
-```
-
-### Verify:
-
-```
-logs/action_logs.json
 ```
 
 ---
 
-## 10. LOGGING VALIDATION
+# 11. ACTION LOG VALIDATION
 
-Log files:
+File:
 
-```
-logs/validation_logs.json  
-logs/anomaly_logs.json  
-logs/pattern_logs.json  
 logs/action_logs.json
-```
 
-Each log entry MUST contain:
+### Verify:
+
+* trace_id present
+* action_type present
+* timestamp present
+
+✔ Entry must be created after button click
+
+---
+
+# 12. LOGGING SYSTEM TEST
+
+Files:
+
+logs/validation_logs.json
+logs/anomaly_logs.json
+logs/pattern_logs.json
+logs/action_logs.json
+
+### Format:
 
 ```json
 {
   "trace_id": "...",
   "timestamp": "...",
-  "type": "...",
-  "data": {...}
+  "type": "VALIDATION | ANALYSIS | PATTERN | ACTION",
+  "data": {}
 }
 ```
 
----
-
-## 11. FAILURE HANDLING TEST
-
-### Test Scenarios
-
-| Case | Expected |
-|------|---------|
-| Empty input | ERROR |
-| Invalid JSON | ERROR |
-| Missing fields | ERROR |
-| Wrong type | ERROR |
-
-System MUST:
-
-- NEVER crash  
-- ALWAYS return structured error  
+✔ Logs must be consistent and readable
 
 ---
 
-## 12. INPUT GATE TEST
+# 13. FAILURE HANDLING TEST
+
+### Test Cases
+
+| Case           | Expected |
+| -------------- | -------- |
+| Empty input    | ERROR    |
+| Invalid JSON   | ERROR    |
+| Missing fields | ERROR    |
+| Wrong types    | ERROR    |
+
+✔ System MUST:
+
+* never crash
+* always return structured error
+
+---
+
+# 14. INPUT GATE TEST
 
 Before validation:
 
-| Case | Expected |
-|------|---------|
-| Non-dict input | ERROR |
-| Empty input | ERROR |
-| Missing keys | ERROR |
+| Case           | Expected |
+| -------------- | -------- |
+| Non-dict input | ERROR    |
+| Empty input    | ERROR    |
+| Missing keys   | ERROR    |
 
 ---
 
-## 13. DEMO FLOW VALIDATION
+# 15. DEMO FLOW VALIDATION
 
 Run:
 
-```
 python run_demo_full.py
-```
 
-### Expected Flow:
+### Expected Flow
 
-1. Dataset load  
-2. Signal conversion  
-3. Validation  
-4. Intelligence output  
-5. Pattern detection  
-6. Dashboard launch  
-7. Action trigger  
-8. Log verification  
+1. Dataset load
+2. Signal conversion
+3. Validation
+4. Intelligence output
+5. Pattern detection
+6. Dashboard launch
+7. Action click
+8. Log verification
 
----
-
-## 14. SUCCESS CRITERIA
-
-System passes testing if:
-
-- No crashes  
-- All errors structured  
-- Dashboard stable  
-- Actions logged  
-- Patterns detected  
-- Trace IDs consistent  
-- Logs properly formatted  
+✔ Must run WITHOUT interruption
 
 ---
 
-## 15. FINAL STATUS
+# 16. SUCCESS CRITERIA
+
+System passes if:
+
+* No crashes
+* All errors structured
+* Dashboard stable
+* Actions logged
+* Patterns detected
+* Trace IDs consistent
+* Logs properly formatted
+
+---
+
+# 17. FINAL STATUS
 
 NICAI is:
 
-- Deterministic  
-- Traceable  
-- Failure-safe  
-- Demo-ready  
-- TANTRA-aligned  
+* Deterministic
+* Traceable
+* Failure-safe
+* Demo-ready
+* Minimal & controlled
 
 ---
 
-## CONCLUSION
+# CONCLUSION
 
-The NICAI system has been validated under:
+NICAI has been validated under:
 
-**BHIV Universal Testing Protocol**
+BHIV Universal Testing Protocol
 
 It is now a:
 
-→ Stable  
-→ Controlled  
-→ Demo-safe intelligence system  
+→ Stable
+→ Controlled
+→ Demo-safe intelligence system
 
-Ready for final demonstration and evaluation.
+Ready for final demo and evaluation
