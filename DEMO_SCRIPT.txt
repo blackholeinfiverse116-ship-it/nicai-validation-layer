@@ -47,7 +47,7 @@ Show console:
 
 Say:
 
-"Each signal is validated and then analyzed using rule-based logic to detect anomalies.
+"Each signal is validated and then analyzed using rule-based logic to detect anomalies.  
 There is no randomness or black-box AI involved."
 
 ---
@@ -65,6 +65,7 @@ Say:
 ---
 
 ## 🖥 STEP 5 — DASHBOARD 
+
 Open:
 
 ```bash
@@ -73,11 +74,11 @@ http://127.0.0.1:8000/dashboard
 
 Show:
 
-* Signal table
-* Risk level
-* Anomaly type
-* Explanation
-* Recommended step
+* Signal table  
+* Risk level  
+* Anomaly type  
+* Explanation  
+* Recommended step  
 
 Say:
 
@@ -85,11 +86,11 @@ Say:
 
 ---
 
-## ⚡ STEP 6 — ACTION LAYER 
+## ⚡ STEP 6 — ACTION LAYER (UI)
 
 Click button:
 
-* Escalate / Review / Monitor
+* Escalate / Review / Monitor  
 
 Say:
 
@@ -97,7 +98,56 @@ Say:
 
 ---
 
-## 📜 STEP 7 — ACTION LOG
+## 🧪 STEP 7 — ACTION TEST (API PROOF)
+
+### Open API Docs
+
+```bash
+http://127.0.0.1:8000/docs
+```
+
+### Select Endpoint
+
+```
+POST /action
+```
+
+### Click "Try it out"
+
+### Paste Input
+
+```json
+{
+  "trace_id": "TEST123",
+  "action_type": "ESCALATE",
+  "risk_level": "HIGH"
+}
+```
+
+### Click Execute
+
+### ✅ Expected Output
+
+```json
+{
+  "status": "SUCCESS",
+  "action": {
+    "trace_id": "TEST123",
+    "action_type": "ESCALATE",
+    "target_role": "authority",
+    "timestamp": "...",
+    "context": {}
+  }
+}
+```
+
+Say:
+
+"This confirms that action routing is structured, controlled, and traceable."
+
+---
+
+## 📜 STEP 8 — ACTION LOG
 
 Open:
 
@@ -107,9 +157,9 @@ logs/action_logs.json
 
 Show:
 
-* trace_id
-* action_type
-* timestamp
+* trace_id  
+* action_type  
+* timestamp  
 
 Say:
 
@@ -117,12 +167,12 @@ Say:
 
 ---
 
-## 🔗 STEP 8 — TRACE CONTINUITY 
+## 🔗 STEP 9 — TRACE CONTINUITY 
 
 Match:
 
-* trace_id in dashboard
-* trace_id in logs
+* trace_id in dashboard  
+* trace_id in logs  
 
 Say:
 
@@ -137,21 +187,23 @@ Say:
 ---
 
 # ✅ DEMO RULES 
-* No extra endpoints
-* No debugging during demo
-* Follow exact sequence
-* Show only key outputs
-* Keep explanation simple and precise
+
+* No extra endpoints  
+* No debugging during demo  
+* Follow exact sequence  
+* Show only key outputs  
+* Keep explanation simple and precise  
 
 ---
 
 # 🔥 DEMO SUCCESS CHECKLIST
 
-* System runs without crash
-* Dashboard loads correctly
-* Action button logs successfully
-* trace_id matches across layers
-* Logs visible
+* System runs without crash  
+* Dashboard loads correctly  
+* Action button logs successfully  
+* API action test works (/docs)  
+* trace_id matches across layers  
+* Logs visible  
 
 ---
 
