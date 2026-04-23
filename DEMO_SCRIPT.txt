@@ -1,27 +1,27 @@
-# NICAI DEMO SCRIPT 
+# NICAI – FINAL DEMO SCRIPT 
 
 ---
 
-## INTRO 
+## 🎯 INTRO
 
-"NICAI is a deterministic intelligence system that processes real-world data and generates traceable intelligence outputs without taking decisions."
+"NICAI is a deterministic intelligence system that processes real-world data and generates **traceable, explainable intelligence outputs without taking decisions**."
 
 ---
 
-## STEP 1 — RAW DATA 
+## 📥 STEP 1 — DATA INGESTION 
 
 Show:
 
-- clean_weather.csv  
-- clean_aqi.csv  
+* clean_weather.csv
+* clean_aqi.csv
 
 Say:
 
-"System starts with real environmental datasets containing weather and air quality signals."
+"System starts with real environmental datasets like weather and AQI, which are converted into standardized signals."
 
 ---
 
-## STEP 2 — RUN SYSTEM 
+## ⚙️ STEP 2 — RUN SYSTEM 
 
 Run:
 
@@ -31,40 +31,40 @@ python run_demo_full.py
 
 Show:
 
-- Total signals count  
+* Total signals count
 
 Say:
 
-"These datasets are converted into standardized signals and passed into the NICAI pipeline."
+"All signals are passed through a deterministic pipeline — same input always produces same output."
 
 ---
 
-## STEP 3 — VALIDATION + ANALYSIS 
+## 🔍 STEP 3 — VALIDATION + INTELLIGENCE 
 
 Show console:
 
-- LOW / MEDIUM / HIGH counts  
+* LOW / MEDIUM / HIGH counts
 
 Say:
 
-"Each signal goes through strict validation and deterministic anomaly detection."
+"Each signal is validated and then analyzed using rule-based logic to detect anomalies.
+There is no randomness or black-box AI involved."
 
 ---
 
-## STEP 4 — PATTERN DETECTION 
+## 📊 STEP 4 — PATTERN DETECTION 
 
 Show:
 
-- Pattern output  
+* Pattern output
 
 Say:
 
-"System performs multi-signal analysis to detect patterns across regions."
+"NICAI also performs multi-signal analysis to detect patterns like anomaly clusters across regions."
 
 ---
 
-## STEP 5 — DASHBOARD 
-
+## 🖥 STEP 5 — DASHBOARD 
 Open:
 
 ```bash
@@ -73,31 +73,31 @@ http://127.0.0.1:8000/dashboard
 
 Show:
 
-- Signals table  
-- Risk levels  
-- Action buttons  
+* Signal table
+* Risk level
+* Anomaly type
+* Explanation
+* Recommended step
 
 Say:
 
-"Dashboard provides real-time visibility of validated signals and detected anomalies."
+"This dashboard provides clear, explainable intelligence — every output is human-readable."
 
 ---
 
-## STEP 6 — TRIGGER ACTION 
+## ⚡ STEP 6 — ACTION LAYER 
 
-Click any button:
+Click button:
 
-- eligible_for_escalation  
-- requires_review  
-- monitor  
+* Escalate / Review / Monitor
 
 Say:
 
-"NICAI does not take decisions. It only generates structured recommendation signals."
+"NICAI does not execute actions. It only generates structured action payloads based on risk level."
 
 ---
 
-## STEP 7 — VERIFY LOG 
+## 📜 STEP 7 — ACTION LOG
 
 Open:
 
@@ -107,29 +107,54 @@ logs/action_logs.json
 
 Show:
 
-- trace_id  
-- action_type  
-- timestamp  
+* trace_id
+* action_type
+* timestamp
 
 Say:
 
-"All actions are logged with full traceability."
+"All actions are logged with full traceability and auditability."
 
 ---
 
-## STEP 8 — TRACE CONTINUITY 
+## 🔗 STEP 8 — TRACE CONTINUITY 
 
 Match:
 
-- trace_id in dashboard  
-- trace_id in logs  
+* trace_id in dashboard
+* trace_id in logs
 
 Say:
 
-"The same trace_id flows across validation, analysis, and action logging."
+"The same trace_id flows across validation, intelligence, and action logging — ensuring complete system traceability."
 
 ---
 
-## CLOSING 
+## 🏁 CLOSING 
 
-"NICAI ensures deterministic processing, full traceability, and safe intelligence-driven workflows."
+"NICAI ensures deterministic processing, full traceability, and safe intelligence-driven workflows — without taking decisions."
+
+---
+
+# ✅ DEMO RULES 
+* No extra endpoints
+* No debugging during demo
+* Follow exact sequence
+* Show only key outputs
+* Keep explanation simple and precise
+
+---
+
+# 🔥 DEMO SUCCESS CHECKLIST
+
+* System runs without crash
+* Dashboard loads correctly
+* Action button logs successfully
+* trace_id matches across layers
+* Logs visible
+
+---
+
+# 🎯 FINAL MESSAGE
+
+"NICAI is not about automation — it is about delivering **clean, reliable, and explainable intelligence** for better decision-making."
