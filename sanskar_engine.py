@@ -10,7 +10,7 @@ from error_handler import error_response
 def detect_zone(lat, lon):
     try:
         lat = float(lat)
-
+ 
         if lat > 23:
             return "North"
         elif lat > 20:
