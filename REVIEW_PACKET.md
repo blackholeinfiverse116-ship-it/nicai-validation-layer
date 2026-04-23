@@ -12,13 +12,13 @@ python run_demo_full.py
 
 This performs:
 
-1. Dataset loading  
-2. Signal conversion  
-3. Validation  
-4. Intelligence analysis  
-5. Pattern detection  
-6. API startup  
-7. Dashboard access  
+1. Dataset loading
+2. Signal conversion
+3. Validation
+4. Intelligence analysis
+5. Pattern detection
+6. API startup
+7. Dashboard access
 
 Ensures a **single, clean, repeatable demo flow**.
 
@@ -55,8 +55,9 @@ Logging System
 NICAI does NOT take decisions.
 
 It only produces:
-- intelligence outputs  
-- structured recommendation signals  
+
+* intelligence outputs
+* structured recommendation signals
 
 ---
 
@@ -69,8 +70,6 @@ main.py
 validator.py
 sanskar_engine.py
 samachar_input_adapter.py
-dashboard.py
-action_router.py
 error_handler.py
 
 run_demo_full.py
@@ -82,6 +81,13 @@ REVIEW_PACKET.md
 TESTING_PACKET.md
 README.md
 ```
+
+👉 Removed:
+
+* ❌ extra/duplicate dashboard files
+* ❌ unnecessary router splits
+
+System is kept **minimal and demo-safe**
 
 ---
 
@@ -105,16 +111,16 @@ Standard error response:
 
 System guarantees:
 
-- ❌ No crashes  
-- ❌ No undefined behavior  
-- ✅ Always structured output  
+* ❌ No crashes
+* ❌ No undefined behavior
+* ✅ Always structured output
 
 Handled cases:
 
-- missing fields  
-- invalid dataset  
-- wrong data types  
-- empty input  
+* missing fields
+* invalid dataset
+* wrong data types
+* empty input
 
 ---
 
@@ -124,14 +130,14 @@ Before validation:
 
 System ensures:
 
-- input is valid JSON / dict / list  
-- required fields exist  
-- no null critical values  
+* input is valid dict / list
+* required fields exist
+* no null critical values
 
 If invalid:
 
-→ pipeline stops early  
-→ structured error returned  
+→ pipeline stops early
+→ structured error returned
 
 ---
 
@@ -145,9 +151,9 @@ validator.py
 
 Responsibilities:
 
-- schema validation  
-- dataset verification  
-- trace_id generation  
+* schema validation
+* dataset verification
+* trace_id generation
 
 Output:
 
@@ -174,20 +180,19 @@ sanskar_engine.py
 Deterministic anomaly detection:
 
 | Condition | Risk Level |
-|----------|-----------|
-| Normal   | LOW       |
-| Elevated | MEDIUM    |
-| Extreme  | HIGH      |
+| --------- | ---------- |
+| Normal    | LOW        |
+| Elevated  | MEDIUM     |
+| Extreme   | HIGH       |
 
 ### Output Contract (LOCKED)
 
 ```json
 {
   "risk_level": "HIGH",
-  "anomaly_type": "TEMPERATURE_SPIKE",
+  "anomaly_type": "...",
   "explanation": "...",
-  "temporal_context": "current_window",
-  "confidence": 0.9,
+  "anomaly_score": 0.9,
   "recommendation_signal": "eligible_for_escalation"
 }
 ```
@@ -200,14 +205,14 @@ NICAI does NOT take decisions.
 
 Allowed outputs:
 
-- `eligible_for_escalation`
-- `requires_review`
-- `monitor`
+* `eligible_for_escalation`
+* `requires_review`
+* `monitor`
 
 Removed:
 
-- ❌ ESCALATE  
-- ❌ REVIEW  
+* ❌ direct decision execution
+* ❌ automated actions
 
 ---
 
@@ -221,9 +226,9 @@ sanskar_engine.py
 
 Detects:
 
-- anomaly clusters  
-- repeated anomalies  
-- affected zones  
+* anomaly clusters
+* repeated anomalies
+* affected zones
 
 Output:
 
@@ -242,75 +247,73 @@ Output:
 
 # 10. Dashboard (Fail-Safe Mode)
 
-File:
+Endpoint:
 
 ```
-dashboard.py
+/dashboard
 ```
 
 Features:
 
-- signal table  
-- anomaly insights  
-- risk levels  
-- action buttons  
-- pattern summary  
+* signal table
+* risk level
+* anomaly type
+* explanation
+* ✅ Recommended Step (Added)
+* action buttons
 
 Fail-safe behavior:
 
-```
-No data / invalid input
-```
-
-System NEVER crashes or shows blank screen.
+* shows message if no data
+* never crashes
+* no blank screen
 
 ---
 
+# 11. Action Layer (Controlled Simulation)
+
+Endpoint:
+
+```
+/action
 ```
 
 Purpose:
 
-- simulate routing of actions  
-- no execution logic  
+* simulate routing of actions
+* no execution logic
 
 Mapping:
 
-| Risk Level | Action | Target Role |
-|-----------|--------|-------------|
-| HIGH      | eligible_for_escalation | authority |
-| MEDIUM    | requires_review | operator |
-| LOW       | monitor | system |
+| Risk Level | Action   | Target Role |
+| ---------- | -------- | ----------- |
+| HIGH       | ESCALATE | authority   |
+| MEDIUM     | REVIEW   | operator    |
+| LOW        | MONITOR  | system      |
 
 All actions are:
 
-- logged  
-- traceable  
-- non-executable  
+* logged
+* traceable
+* non-executable
 
 ---
 
-# 11. API Layer
+# 12. API Surface (Reduced – Demo Safe)
 
-File:
+Final endpoints:
 
-```
-main.py
-```
+| Endpoint          | Method | Description    |
+| ----------------- | ------ | -------------- |
+| `/nicai/evaluate` | POST   | Main pipeline  |
+| `/dashboard`      | GET    | UI dashboard   |
+| `/action`         | POST   | Action logging |
 
-Endpoints:
-
-| Endpoint | Method | Description |
-|----------|--------|------------|
-| `/validate` | POST | Validate signal |
-| `/pipeline` | POST | Validation + analysis |
-| `/nicai/evaluate` | POST | Final intelligence |
-| `/run` | GET | Batch processing |
-| `/dashboard` | GET | UI dashboard |
-| `/action` | POST | Action logging |
+👉 Removed extra endpoints to reduce demo failure risk
 
 ---
 
-# 12. Logging System (Standardized)
+# 13. Logging System (Standardized)
 
 All logs stored in:
 
@@ -320,10 +323,10 @@ logs/
 
 Files:
 
-- validation_logs.json  
-- anomaly_logs.json  
-- pattern_logs.json  
-- action_logs.json  
+* validation_logs.json
+* anomaly_logs.json
+* pattern_logs.json
+* action_logs.json
 
 Each log entry:
 
@@ -338,7 +341,7 @@ Each log entry:
 
 ---
 
-# 13. Traceability
+# 14. Traceability (Critical Demo Feature)
 
 Every signal gets a `trace_id`.
 
@@ -353,11 +356,15 @@ Signal
  → Action Log
 ```
 
-Ensures complete trace tracking across system.
+Ensures:
+
+* full tracking
+* auditability
+* explainability
 
 ---
 
-# 14. Deterministic Guarantee
+# 15. Deterministic Guarantee
 
 ```
 Same Input → Same Output
@@ -365,36 +372,60 @@ Same Input → Same Output
 
 Implemented via:
 
-- rule-based logic  
-- fixed thresholds  
-- deterministic trace_id  
+* rule-based logic
+* fixed thresholds
+* deterministic trace_id
 
 No randomness used.
 
 ---
 
-# 15. Final Outcome
+# 16. Final Demo Flow (LOCKED)
+
+1. Run system (`run_demo_full.py`)
+2. Show dataset ingestion
+3. Show signal generation
+4. Show anomaly detection
+5. Show pattern detection
+6. Open dashboard
+7. Click action button
+8. Show action_logs.json
+9. Show trace_id continuity
+
+👉 This flow is fixed (no improvisation)
+
+---
+
+# 17. Final Outcome
 
 NICAI is now:
 
-- ✅ Independent system  
-- ✅ Crash-free  
-- ✅ Failure-safe  
-- ✅ Deterministic  
-- ✅ Fully traceable  
-- ✅ Demo-ready  
-- ✅ TANTRA-aligned  
+* ✅ Independent system
+* ✅ Crash-free
+* ✅ Failure-safe
+* ✅ Deterministic
+* ✅ Fully traceable
+* ✅ Demo-ready
+* ✅ TANTRA-compliant
 
 ---
 
 # Conclusion
 
-NICAI is a **stable, unified intelligence system** that:
+NICAI is a **stable, controlled intelligence system** that:
 
-- processes real-world signals  
-- detects anomalies  
-- identifies patterns  
-- generates structured recommendation signals  
-- maintains full traceability  
+* processes real-world signals
+* detects anomalies
+* identifies patterns
+* generates structured recommendation signals
+* maintains full traceability
 
-Ready for **demo, evaluation, and controlled deployment**.
+It is optimized for:
+
+👉 **clear demonstration**
+👉 **zero-failure execution**
+👉 **explainable intelligence delivery**
+
+---
+
+🚀 **System is now demo-proof and ready for presentation.**
