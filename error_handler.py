@@ -5,7 +5,7 @@ import hashlib
 def generate_error_trace_id(message):
     return hashlib.sha256(message.encode()).hexdigest()
 
- 
+
 def error_response(reason, trace_id=None):
     return {
         "status": "ERROR",
