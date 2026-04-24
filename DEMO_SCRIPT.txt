@@ -1,4 +1,4 @@
-# NICAI – FINAL DEMO SCRIPT 
+# 🚀 NICAI – FINAL DEMO SCRIPT (UPDATED & TASK-COMPLIANT)
 
 ---
 
@@ -8,132 +8,122 @@
 
 ---
 
-## 📥 STEP 1 — DATA INGESTION 
+## 📥 STEP 1 — DATA INGESTION
 
-Show:
+### Show Files:
+- `clean_weather.csv`
+- `clean_aqi.csv`
 
-* clean_weather.csv
-* clean_aqi.csv
-
-Say:
-
-"System starts with real environmental datasets like weather and AQI, which are converted into standardized signals."
+"System starts with real environmental datasets like weather and AQI, which are converted into standardized signals for processing."
 
 ---
 
-## ⚙️ STEP 2 — RUN SYSTEM 
+## ⚙️ STEP 2 — RUN SYSTEM
 
-Run:
-
+### Run:
 ```bash
 python run_demo_full.py
 ```
 
-Show:
+### Show:
+- Total signals count
 
-* Total signals count
-
-Say:
-
-"All signals are passed through a deterministic pipeline — same input always produces same output."
+"All signals are processed through a deterministic pipeline — meaning the same input will always produce the same output."
 
 ---
 
-## 🔍 STEP 3 — VALIDATION + INTELLIGENCE 
+## 🔍 STEP 3 — VALIDATION + INTELLIGENCE
 
-Show console:
+### Show Console Output:
+- Validation results (ALLOW / FLAG / REJECT)
+- Risk distribution (LOW / MEDIUM / HIGH)
 
-* LOW / MEDIUM / HIGH counts
-
-Say:
-
-"Each signal is validated and then analyzed using rule-based logic to detect anomalies.  
+"Each signal is first validated and then analyzed using rule-based logic to detect anomalies.  
 There is no randomness or black-box AI involved."
 
 ---
 
-## 📊 STEP 4 — PATTERN DETECTION 
+## 📊 STEP 4 — PATTERN DETECTION
 
-Show:
+### Show:
+- Pattern Summary:
+  - Pattern ID
+  - Anomaly Count
+  - Affected Zones
+  - Pattern Type
+  - Trend
 
-* Pattern output
-
-Say:
-
-"NICAI also performs multi-signal analysis to detect patterns like anomaly clusters across regions."
+"NICAI performs multi-signal analysis to detect patterns like anomaly clusters across different zones."
 
 ---
 
-## 🖥 STEP 5 — DASHBOARD 
+## 🖥 STEP 5 — DASHBOARD
 
-Open:
-
+### Open:
 ```bash
 http://127.0.0.1:8000/dashboard
 ```
 
-Show:
+### Show Table Columns:
+- ID  
+- Trace ID  
+- Validation Status  
+- Risk Level  
+- Confidence  
+- Anomaly Type  
+- Explanation  
+- Recommended Step  
 
-* Signal table  
-* Risk level  
-* Anomaly type  
-* Explanation  
-* Recommended step  
-
-Say:
-
-"This dashboard provides clear, explainable intelligence — every output is human-readable."
+"This dashboard provides clear and explainable intelligence.  
+Every signal includes validation status and trace_id for full transparency."
 
 ---
 
 ## ⚡ STEP 6 — ACTION LAYER (UI)
 
-Click button:
+### Click Buttons:
+- Escalate  
+- Review  
+- Monitor  
 
-* Escalate / Review / Monitor  
-
-Say:
-
-"NICAI does not execute actions. It only generates structured action payloads based on risk level."
+"NICAI does not execute actions. It only generates structured action payloads based on risk levels."
 
 ---
 
 ## 🧪 STEP 7 — ACTION TEST (API PROOF)
 
-### Open API Docs
-
+### Open API Docs:
 ```bash
 http://127.0.0.1:8000/docs
 ```
 
-### Select Endpoint
-
+### Select Endpoint:
 ```
 POST /action
 ```
 
-### Click "Try it out"
+### Click:
+- "Try it out"
 
-### Paste Input
-
+### Paste Input:
 ```json
 {
   "trace_id": "TEST123",
-  "action_type": "ESCALATE",
+  "action_type": "eligible_for_escalation",
   "risk_level": "HIGH"
 }
 ```
 
-### Click Execute
+### Click:
+- Execute
 
-### ✅ Expected Output
-
+### ✅ Expected Output:
 ```json
 {
   "status": "SUCCESS",
   "action": {
     "trace_id": "TEST123",
-    "action_type": "ESCALATE",
+    "action_type": "eligible_for_escalation",
     "target_role": "authority",
     "timestamp": "...",
     "context": {}
@@ -141,69 +131,64 @@ POST /action
 }
 ```
 
-Say:
-
-"This confirms that action routing is structured, controlled, and traceable."
+"This confirms that action routing is structured, controlled, and fully traceable."
 
 ---
 
 ## 📜 STEP 8 — ACTION LOG
 
-Open:
-
+### Open:
 ```bash
 logs/action_logs.json
 ```
 
-Show:
-
-* trace_id  
-* action_type  
-* timestamp  
-
-Say:
+### Show:
+- trace_id  
+- action_type  
+- timestamp  
 
 "All actions are logged with full traceability and auditability."
 
 ---
 
-## 🔗 STEP 9 — TRACE CONTINUITY 
+## 🔗 STEP 9 — TRACEABILITY CHECK
 
-Match:
+### Match Same trace_id in:
+- Dashboard  
+- validation_logs.json  
+- anomaly_logs.json  
+- action_logs.json  
 
-* trace_id in dashboard  
-* trace_id in logs  
-
-Say:
-
-"The same trace_id flows across validation, intelligence, and action logging — ensuring complete system traceability."
+"The same trace_id flows across validation, intelligence, and action layers — ensuring complete system traceability."
 
 ---
 
-## 🏁 CLOSING 
+## 🏁 CLOSING
 
 "NICAI ensures deterministic processing, full traceability, and safe intelligence-driven workflows — without taking decisions."
 
 ---
 
-# ✅ DEMO RULES 
+# ✅ DEMO RULES
 
-* No extra endpoints  
-* No debugging during demo  
-* Follow exact sequence  
-* Show only key outputs  
-* Keep explanation simple and precise  
+- No extra endpoints  
+- No debugging during demo  
+- Follow exact sequence  
+- Show only key outputs  
+- Keep explanation simple and precise  
 
 ---
 
 # 🔥 DEMO SUCCESS CHECKLIST
 
-* System runs without crash  
-* Dashboard loads correctly  
-* Action button logs successfully  
-* API action test works (/docs)  
-* trace_id matches across layers  
-* Logs visible  
+- ✅ System runs without crash  
+- ✅ Dashboard loads correctly  
+- ✅ Validation status visible  
+- ✅ Trace ID visible  
+- ✅ Action buttons working  
+- ✅ API action test works (/docs)  
+- ✅ Logs updating correctly  
+- ✅ Traceability verified  
 
 ---
 
