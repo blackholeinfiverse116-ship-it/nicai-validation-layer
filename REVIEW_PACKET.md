@@ -6,7 +6,7 @@
 
 The entire NICAI system is executed using ONE command:
 
-```
+```bash
 python run_demo_full.py
 ```
 
@@ -20,15 +20,15 @@ This performs:
 6. API startup
 7. Dashboard access
 
-Ensures a **single, clean, repeatable demo flow**.
+✔ Ensures a **single, clean, repeatable demo flow**
 
 ---
 
 # 2. System Architecture (Final)
 
-NICAI is a **deterministic intelligence pipeline**.
+NICAI is a **deterministic intelligence pipeline**:
 
-```
+```text
 Dataset
    ↓
 Samachar Input Adapter
@@ -56,46 +56,44 @@ NICAI does NOT take decisions.
 
 It only produces:
 
-* intelligence outputs
-* structured recommendation signals
+* Structured intelligence outputs
+* Recommendation signals
 
 ---
 
 # 3. Core Files (Final Structure)
 
-```
+```text
 nicai_system/
 
-main.py
-validator.py
-sanskar_engine.py
-samachar_input_adapter.py
-error_handler.py
+│── main.py
+│── validator.py
+│── sanskar_engine.py
+│── samachar_input_adapter.py
+│── dataset_registry.py
+│── utils.py
+│── error_handler.py
 
-run_demo_full.py
+│── run_demo_full.py
 
-logs/
-data/
+│── logs/
+│── data/
 
-REVIEW_PACKET.md
-TESTING_PACKET.md
-README.md
+│── README.md
+│── REVIEW_PACKET.md
+│── TESTING_PACKET.md
 ```
 
-👉 Removed:
-
-* ❌ extra/duplicate dashboard files
-* ❌ unnecessary router splits
-
-System is kept **minimal and demo-safe**
+✔ Minimal, clean, demo-safe structure
+❌ Removed unnecessary/duplicate files
 
 ---
 
 # 4. Failure Handling (Critical)
 
-All failures are handled through:
+Centralized via:
 
-```
+```text
 error_handler.py
 ```
 
@@ -117,10 +115,10 @@ System guarantees:
 
 Handled cases:
 
-* missing fields
-* invalid dataset
-* wrong data types
-* empty input
+* Missing fields
+* Invalid dataset
+* Wrong data types
+* Empty input
 
 ---
 
@@ -130,14 +128,14 @@ Before validation:
 
 System ensures:
 
-* input is valid dict / list
-* required fields exist
-* no null critical values
+* Input is valid (dict / list)
+* Required fields exist
+* No null critical values
 
 If invalid:
 
-→ pipeline stops early
-→ structured error returned
+→ Pipeline stops early
+→ Structured error returned
 
 ---
 
@@ -145,22 +143,22 @@ If invalid:
 
 File:
 
-```
+```text
 validator.py
 ```
 
 Responsibilities:
 
-* schema validation
-* dataset verification
-* trace_id generation
+* Schema validation
+* Dataset verification
+* Trace ID generation
 
 Output:
 
 ```json
 {
   "signal_id": "...",
-  "status": "VALID | FLAG | ERROR",
+  "status": "ALLOW | FLAG | REJECT",
   "confidence_score": 0.9,
   "trace_id": "...",
   "reason": "..."
@@ -173,7 +171,7 @@ Output:
 
 File:
 
-```
+```text
 sanskar_engine.py
 ```
 
@@ -185,7 +183,7 @@ Deterministic anomaly detection:
 | Elevated  | MEDIUM     |
 | Extreme   | HIGH       |
 
-### Output Contract (LOCKED)
+Output contract:
 
 ```json
 {
@@ -193,6 +191,7 @@ Deterministic anomaly detection:
   "anomaly_type": "...",
   "explanation": "...",
   "anomaly_score": 0.9,
+  "confidence": 0.95,
   "recommendation_signal": "eligible_for_escalation"
 }
 ```
@@ -201,7 +200,7 @@ Deterministic anomaly detection:
 
 # 8. TANTRA Compliance (Mandatory)
 
-NICAI does NOT take decisions.
+NICAI does NOT execute decisions.
 
 Allowed outputs:
 
@@ -209,10 +208,10 @@ Allowed outputs:
 * `requires_review`
 * `monitor`
 
-Removed:
+❌ Removed:
 
-* ❌ direct decision execution
-* ❌ automated actions
+* Direct execution logic
+* Automated actions
 
 ---
 
@@ -220,26 +219,26 @@ Removed:
 
 Handled in:
 
-```
+```text
 sanskar_engine.py
 ```
 
 Detects:
 
-* anomaly clusters
-* repeated anomalies
-* affected zones
+* Anomaly clusters
+* Repeated anomalies
+* Affected zones
 
 Output:
 
 ```json
 {
   "pattern_id": "PATTERN_xxx",
-  "anomaly_count": 3,
-  "affected_zones": ["North"],
-  "pattern_type": "REPEATED_ANOMALY",
-  "pattern_summary": "...",
-  "severity_trend": "STABLE"
+  "anomaly_count": 15,
+  "affected_zones": ["Central", "North", "South"],
+  "pattern_type": "CLUSTER_ANOMALY",
+  "pattern_summary": "Anomalies concentrated in North",
+  "severity_trend": "INCREASING"
 }
 ```
 
@@ -249,24 +248,27 @@ Output:
 
 Endpoint:
 
-```
+```text
 /dashboard
 ```
 
 Features:
 
-* signal table
-* risk level
-* anomaly type
-* explanation
-* ✅ Recommended Step (Added)
-* action buttons
+* Signal ID
+* Trace ID
+* Validation Status
+* Risk Level
+* Confidence Score
+* Anomaly Type
+* Explanation
+* Recommended Step
+* Action buttons
 
 Fail-safe behavior:
 
-* shows message if no data
-* never crashes
-* no blank screen
+* Shows fallback message if no data
+* Never crashes
+* No blank screen
 
 ---
 
@@ -274,42 +276,49 @@ Fail-safe behavior:
 
 Endpoint:
 
-```
+```text
 /action
 ```
 
 Purpose:
 
-* simulate routing of actions
-* no execution logic
+* Simulate action routing
+* No real execution
 
 Mapping:
 
-| Risk Level | Action   | Target Role |
-| ---------- | -------- | ----------- |
-| HIGH       | ESCALATE | authority   |
-| MEDIUM     | REVIEW   | operator    |
-| LOW        | MONITOR  | system      |
+| Risk Level | Action Type             | Target Role |
+| ---------- | ----------------------- | ----------- |
+| HIGH       | eligible_for_escalation | authority   |
+| MEDIUM     | requires_review         | operator    |
+| LOW        | monitor                 | system      |
 
-All actions are:
+Output:
 
-* logged
-* traceable
-* non-executable
+```json
+{
+  "status": "SUCCESS",
+  "action": {
+    "trace_id": "TRACE_xxx",
+    "action_type": "eligible_for_escalation",
+    "target_role": "authority",
+    "timestamp": "...",
+    "context": {}
+  }
+}
+```
 
 ---
 
 # 12. API Surface (Reduced – Demo Safe)
 
-Final endpoints:
+| Endpoint          | Method          | Description    |
+| ----------------- | --------------- | -------------- |
+| `/dashboard`      | GET             | UI dashboard   |
+| `/action`         | POST            | Action logging |
+| `/nicai/evaluate` | POST (optional) | Full pipeline  |
 
-| Endpoint          | Method | Description    |
-| ----------------- | ------ | -------------- |
-| `/nicai/evaluate` | POST   | Main pipeline  |
-| `/dashboard`      | GET    | UI dashboard   |
-| `/action`         | POST   | Action logging |
-
-👉 Removed extra endpoints to reduce demo failure risk
+✔ Minimal endpoints → lower demo risk
 
 ---
 
@@ -317,7 +326,7 @@ Final endpoints:
 
 All logs stored in:
 
-```
+```text
 logs/
 ```
 
@@ -328,7 +337,7 @@ Files:
 * pattern_logs.json
 * action_logs.json
 
-Each log entry:
+Log format:
 
 ```json
 {
@@ -341,42 +350,37 @@ Each log entry:
 
 ---
 
-# 14. Traceability (Critical Demo Feature)
+# 14. Traceability (Critical Feature)
 
-Every signal gets a `trace_id`.
+Each signal gets a unique `trace_id`.
 
 Flow:
 
-```
-Signal
- → Validation
- → Analysis
- → Pattern
- → Dashboard
- → Action Log
+```text
+Signal → Validation → Analysis → Pattern → Dashboard → Action Log
 ```
 
 Ensures:
 
-* full tracking
-* auditability
-* explainability
+* Full tracking
+* Auditability
+* Explainability
 
 ---
 
 # 15. Deterministic Guarantee
 
-```
+```text
 Same Input → Same Output
 ```
 
-Implemented via:
+Achieved via:
 
-* rule-based logic
-* fixed thresholds
-* deterministic trace_id
+* Rule-based logic
+* Fixed thresholds
+* Deterministic trace_id
 
-No randomness used.
+❌ No randomness used
 
 ---
 
@@ -388,11 +392,11 @@ No randomness used.
 4. Show anomaly detection
 5. Show pattern detection
 6. Open dashboard
-7. Click action button
+7. Trigger action
 8. Show action_logs.json
-9. Show trace_id continuity
+9. Demonstrate trace_id flow
 
-👉 This flow is fixed (no improvisation)
+✔ Fixed, reliable demo sequence
 
 ---
 
@@ -414,18 +418,18 @@ NICAI is now:
 
 NICAI is a **stable, controlled intelligence system** that:
 
-* processes real-world signals
-* detects anomalies
-* identifies patterns
-* generates structured recommendation signals
-* maintains full traceability
+* Processes real-world signals
+* Detects anomalies
+* Identifies patterns
+* Generates structured recommendation signals
+* Maintains full traceability
 
 It is optimized for:
 
-👉 **clear demonstration**
-👉 **zero-failure execution**
-👉 **explainable intelligence delivery**
+👉 Clear demonstration
+👉 Zero-failure execution
+👉 Explainable intelligence delivery
 
 ---
 
-🚀 **System is now demo-proof and ready for presentation.**
+🚀 **System is fully demo-proof and ready for final evaluation.**
