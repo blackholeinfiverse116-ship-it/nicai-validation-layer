@@ -6,7 +6,7 @@ import json
 import os
 import traceback   # ✅ FIX: import at top
 from datetime import datetime, timezone
- 
+
 from samachar_input_adapter import load_data, convert_to_signals
 from sanskar_engine import analyze_signal, analyze_patterns
 from error_handler import error_response, validate_basic_input
