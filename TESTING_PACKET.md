@@ -1,4 +1,4 @@
-# NICAI – TESTING PACKET (FINAL – DEMO SAFE)
+# NICAI – TESTING PACKET (FINAL – TASK-COMPLIANT & DEMO SAFE)
 
 **Project:** NICAI – Networked Intelligence & Context Analysis Interface
 **Developer:** Ankita Prajapati
@@ -18,8 +18,8 @@ python run_demo_full.py
 
 * ✅ Datasets loaded successfully
 * ✅ Signals generated (count displayed)
-* ✅ Validation + Intelligence processing complete
-* ✅ Risk distribution shown (LOW / MEDIUM / HIGH)
+* ✅ Validation completed (ALLOW / FLAG / REJECT visible)
+* ✅ Intelligence processing complete (LOW / MEDIUM / HIGH)
 * ✅ Pattern detection output displayed
 * ✅ FastAPI server starts
 
@@ -45,8 +45,10 @@ data/clean_aqi.csv
 ### Validation
 
 * Data loads without error
-* Signals successfully generated
-* No null or corrupted entries break pipeline
+* Signals generated successfully
+* No null/corrupt entries break pipeline
+
+✔ Confirms **real data → usable signals**
 
 ---
 
@@ -56,9 +58,9 @@ File: `samachar_input_adapter.py`
 
 ### Expected
 
-* Output is a **list of signals**
-* Each signal is a valid dictionary
-* Contains required fields:
+* Output is a **list**
+* Each item is a **valid signal dictionary**
+* Required fields present:
 
 ```json
 {
@@ -72,6 +74,8 @@ File: `samachar_input_adapter.py`
 }
 ```
 
+✔ Ensures input consistency
+
 ---
 
 # 4. VALIDATION LAYER TEST
@@ -80,15 +84,15 @@ File: `validator.py`
 
 ### Test Cases
 
-| Case            | Input              | Expected Output |
-| --------------- | ------------------ | --------------- |
-| Missing field   | No timestamp       | REJECT          |
-| Invalid dataset | Unknown dataset_id | REJECT          |
-| Wrong type      | value = string     | REJECT          |
-| Empty input     | {}                 | REJECT          |
-| Valid signal    | Proper input       | ALLOW / FLAG    |
+| Case            | Input           | Expected     |
+| --------------- | --------------- | ------------ |
+| Missing field   | No timestamp    | REJECT       |
+| Invalid dataset | Unknown dataset | REJECT       |
+| Wrong type      | value = string  | REJECT       |
+| Empty input     | {}              | REJECT       |
+| Valid signal    | Proper input    | ALLOW / FLAG |
 
-### Expected Output Format
+### Output Format
 
 ```json
 {
@@ -100,7 +104,9 @@ File: `validator.py`
 }
 ```
 
-✔ Ensures schema correctness + trace generation
+✔ Schema validation
+✔ Deterministic output
+✔ Trace ID generated
 
 ---
 
@@ -120,6 +126,7 @@ File: `sanskar_engine.py`
 
 ```json
 {
+  "trace_id": "...",
   "risk_level": "HIGH",
   "anomaly_type": "...",
   "explanation": "...",
@@ -129,11 +136,13 @@ File: `sanskar_engine.py`
 }
 ```
 
-✔ Deterministic rule-based output
+✔ Rule-based
+✔ No randomness
+✔ Explainable
 
 ---
 
-# 6. PATTERN DETECTION TEST
+# 6. MULTI-SIGNAL PATTERN TEST
 
 Function: `analyze_patterns()`
 
@@ -142,7 +151,7 @@ Function: `analyze_patterns()`
 * Detect anomaly clusters
 * Count anomalies correctly
 * Identify affected zones
-* Generate deterministic pattern_id
+* Generate deterministic `pattern_id`
 
 ### Output Format
 
@@ -150,16 +159,37 @@ Function: `analyze_patterns()`
 {
   "pattern_id": "PATTERN_xxx",
   "anomaly_count": 15,
-  "affected_zones": ["North", "Central"],
+  "affected_zones": ["North", "Central", "South"],
   "pattern_type": "CLUSTER_ANOMALY",
   "pattern_summary": "...",
   "severity_trend": "INCREASING"
 }
 ```
 
+✔ Matches dashboard
+✔ Based on real processed outputs
+
 ---
 
-# 7. DASHBOARD TEST
+# 7. MULTI-SIGNAL SCENARIO PROOF (MANDATORY)
+
+System must demonstrate:
+
+| Scenario             | Expected    |
+| -------------------- | ----------- |
+| Single signal        | LOW risk    |
+| Mixed signals        | MEDIUM risk |
+| Correlated anomalies | HIGH risk   |
+
+✔ Visible in:
+
+* Dashboard
+* Logs
+* Explanation
+
+---
+
+# 8. DASHBOARD TEST
 
 Open:
 
@@ -171,16 +201,19 @@ http://127.0.0.1:8000/dashboard
 
 * ✅ Data visible
 * ✅ Trace ID shown
-* ✅ Validation status (ALLOW / FLAG) visible
+* ✅ Validation status visible
 * ✅ Risk level displayed
-* ✅ Confidence score shown
+* ✅ Confidence score visible
+* ✅ Explanation readable
 * ✅ Recommended step visible
 * ✅ Action buttons working
-* ❌ No crash / blank page
+* ❌ No crash / blank screen
+
+✔ Confirms UI stability
 
 ---
 
-# 8. ACTION ROUTING TEST (API + UI)
+# 9. ACTION ROUTING TEST (API + UI)
 
 ## Method 1 — Swagger UI
 
@@ -227,11 +260,13 @@ POST /action
 
 * Click any action button
 * Page reloads
-* Action gets logged
+* Action logged
+
+✔ Confirms UI → API connection
 
 ---
 
-# 9. LOGGING SYSTEM TEST
+# 10. LOGGING SYSTEM TEST
 
 Files:
 
@@ -242,7 +277,7 @@ logs/pattern_logs.json
 logs/action_logs.json  
 ```
 
-### Each log entry must contain:
+### Each log entry:
 
 ```json
 {
@@ -253,26 +288,8 @@ logs/action_logs.json
 }
 ```
 
-✔ Ensures auditability
-
----
-
-# 10. FAILURE HANDLING TEST
-
-### Test Cases
-
-| Case            | Expected |
-| --------------- | -------- |
-| Empty input     | ERROR    |
-| Invalid JSON    | ERROR    |
-| Missing fields  | ERROR    |
-| Wrong data type | ERROR    |
-
-### System Must
-
-* ❌ Never crash
-* ✅ Always return structured error
-* ✅ Maintain traceability
+✔ Logs auto-created
+✔ No manual file creation needed
 
 ---
 
@@ -289,7 +306,26 @@ Pick one signal and verify same `trace_id` exists in:
 
 ---
 
-# 12. DEMO FLOW VALIDATION
+# 12. FAILURE HANDLING TEST
+
+### Test Cases
+
+| Case            | Expected |
+| --------------- | -------- |
+| Empty input     | ERROR    |
+| Invalid JSON    | ERROR    |
+| Missing fields  | REJECT   |
+| Wrong data type | REJECT   |
+
+### System MUST
+
+* ❌ Never crash
+* ✅ Always return structured error
+* ✅ Maintain traceability
+
+---
+
+# 13. DEMO FLOW VALIDATION
 
 Run:
 
@@ -300,19 +336,20 @@ python run_demo_full.py
 ### Expected Flow
 
 1. Dataset loading
-2. Signal generation
-3. Validation processing
+2. Signal conversion
+3. Validation
 4. Intelligence output
 5. Pattern detection
 6. Dashboard launch
 7. Action trigger
 8. Log verification
 
-✔ Smooth and uninterrupted flow
+✔ Smooth execution
+✔ No manual fixes
 
 ---
 
-# 13. FINAL SUCCESS CRITERIA
+# 14. FINAL SUCCESS CRITERIA
 
 System passes if:
 
@@ -323,6 +360,7 @@ System passes if:
 * ✅ Patterns detected accurately
 * ✅ Trace IDs consistent
 * ✅ Errors structured
+* ✅ Multi-signal scenarios visible
 
 ---
 
@@ -344,11 +382,11 @@ NICAI is:
 NICAI successfully passes:
 
 * End-to-end execution test
-* Validation and intelligence testing
-* Pattern detection verification
+* Validation & intelligence testing
+* Multi-signal pattern verification
 * Action routing validation (API + UI)
-* Logging and traceability checks
+* Logging & traceability checks
 
 ---
 
-🚀 **System is fully tested, stable, and ready for final evaluation.**
+🚀 **System is fully tested, stable, and ready for final evaluation**
