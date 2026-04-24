@@ -2,10 +2,7 @@ from schemas import required_fields
 from dataset_registry import get_dataset
 from utils import generate_trace_id, validate_output_schema
 
-
-# -------------------------------
-# SAFE OPTIONAL IMPORTS
-# -------------------------------
+# OPTIONAL SAFE IMPORTS
 try:
     from bucket_emitter import emit_bucket_artifact
     from telemetry_emitter import emit_telemetry
@@ -15,20 +12,29 @@ except ImportError:
 
 
 # -------------------------------
-# STANDARD ERROR FORMAT
+# STANDARD REJECT FORMAT (STRICT)
 # -------------------------------
-def build_error(reason, trace_id=None, signal=None):
-    return {
+def build_reject(reason, trace_id=None, signal=None):
+    result = {
         "signal_id": signal.get("signal_id") if isinstance(signal, dict) else None,
-        "status": "ERROR",
+        "status": "REJECT",
         "confidence_score": 0.0,
-        "trace_id": trace_id,
-        "reason": reason
+        "trace_id": trace_id or "TRACE_UNKNOWN",
+        "reason": str(reason)
     }
 
+    try:
+        validate_output_schema(result)
+        emit_bucket_artifact(result)
+        emit_telemetry(signal, result)
+    except:
+        pass
+
+    return result
+
 
 # -------------------------------
-# SAFE TRACE ID
+# SAFE TRACE ID (DETERMINISTIC)
 # -------------------------------
 def safe_trace_id(signal):
     try:
@@ -43,11 +49,8 @@ def safe_trace_id(signal):
 def validate_signal(signal):
 
     try:
-        # -------------------------------
-        # BASIC CHECK
-        # -------------------------------
         if not isinstance(signal, dict):
-            return build_error("Invalid signal format")
+            return build_reject("Invalid signal format")
 
         trace_id = safe_trace_id(signal)
 
@@ -56,34 +59,23 @@ def validate_signal(signal):
         # -------------------------------
         for field in required_fields:
             if field not in signal or signal.get(field) in [None, ""]:
-                result = build_error(f"Missing field: {field}", trace_id, signal)
-
-                validate_output_schema(result)
-                emit_bucket_artifact(result)
-                emit_telemetry(signal, result)
-                return result
+                return build_reject(f"Missing field: {field}", trace_id, signal)
 
         # -------------------------------
-        # SAFE DATASET ID (🔥 FIX)
+        # DATASET CHECK
         # -------------------------------
         dataset_id = signal.get("dataset_id")
 
         if not isinstance(dataset_id, (str, int)):
-            result = build_error("Invalid dataset_id type", trace_id, signal)
-            return result
+            return build_reject("Invalid dataset_id type", trace_id, signal)
 
         dataset = get_dataset(dataset_id)
 
         if not isinstance(dataset, dict):
-            result = build_error("Dataset not registered", trace_id, signal)
-
-            validate_output_schema(result)
-            emit_bucket_artifact(result)
-            emit_telemetry(signal, result)
-            return result
+            return build_reject("Dataset not registered", trace_id, signal)
 
         # -------------------------------
-        # DATASET STATUS CHECK
+        # DATASET STATUS
         # -------------------------------
         if dataset.get("status") != "active":
             result = {
@@ -97,6 +89,7 @@ def validate_signal(signal):
             validate_output_schema(result)
             emit_bucket_artifact(result)
             emit_telemetry(signal, result)
+
             return result
 
         # -------------------------------
@@ -106,63 +99,57 @@ def validate_signal(signal):
         feature = str(signal.get("feature_type", "")).lower()
 
         if not isinstance(value, (int, float)):
-            status = "ERROR"
-            confidence = 0.0
-            reason = "Invalid value type"
+            return build_reject("Invalid value type", trace_id, signal)
 
-        elif feature == "temperature":
-            if value >= 45:
-                status = "FLAG"
-                confidence = 0.6
-                reason = "Extreme temperature"
-            elif value >= 38:
+        # -------------------------------
+        # STRICT RULE ALIGNMENT (ENGINE SYNC)
+        # -------------------------------
+
+        # TEMPERATURE
+        if feature == "temperature":
+            if value >= 35:
                 status = "FLAG"
                 confidence = 0.7
-                reason = "High temperature"
+                reason = "Temperature anomaly"
             else:
-                status = "VALID"
+                status = "ALLOW"
                 confidence = 0.9
                 reason = "Normal temperature"
 
+        # AQI
         elif feature == "aqi":
-            if value >= 300:
-                status = "FLAG"
-                confidence = 0.6
-                reason = "Hazardous AQI"
-            elif value >= 200:
+            if value >= 150:
                 status = "FLAG"
                 confidence = 0.7
-                reason = "Unhealthy AQI"
+                reason = "AQI anomaly"
             else:
-                status = "VALID"
+                status = "ALLOW"
                 confidence = 0.9
                 reason = "Normal AQI"
 
+        # TRAFFIC (SAFE OPTIONAL)
         elif feature == "traffic":
-            if value >= 90:
-                status = "FLAG"
-                confidence = 0.6
-                reason = "Severe traffic"
-            elif value >= 70:
+            if value >= 70:
                 status = "FLAG"
                 confidence = 0.7
-                reason = "Heavy traffic"
+                reason = "Traffic anomaly"
             else:
-                status = "VALID"
+                status = "ALLOW"
                 confidence = 0.9
                 reason = "Normal traffic"
 
+        # DEFAULT SAFE CASE
         else:
-            status = "VALID"
+            status = "ALLOW"
             confidence = 0.8
             reason = "Valid signal"
 
         # -------------------------------
-        # FINAL OUTPUT
+        # FINAL OUTPUT (STRICT CONTRACT)
         # -------------------------------
         result = {
             "signal_id": signal.get("signal_id"),
-            "status": status,
+            "status": status,  # ONLY: ALLOW / FLAG / REJECT
             "confidence_score": confidence,
             "trace_id": trace_id,
             "reason": reason
@@ -175,57 +162,60 @@ def validate_signal(signal):
         return result
 
     except Exception as e:
-        return build_error(str(e), None, signal)
+        return build_reject(str(e), None, signal)
 
 
 # -------------------------------
-# VALIDATE BATCH
+# VALIDATE BATCH (DETERMINISTIC)
 # -------------------------------
 def validate_batch(signals):
 
     try:
         if not isinstance(signals, list):
             return {
-                "status": "ERROR",
+                "status": "REJECT",
                 "reason": "Input must be list",
                 "trace_id": None
             }
 
+        # FILTER + SORT (IMPORTANT FOR DETERMINISM)
         safe_signals = [s for s in signals if isinstance(s, dict)]
-
         safe_signals.sort(key=lambda x: str(x.get("signal_id", "")))
 
         results = [validate_signal(s) for s in safe_signals]
 
-        return {"results": results}
+        return {
+            "status": "SUCCESS",
+            "results": results
+        }
 
     except Exception as e:
         return {
-            "status": "ERROR",
+            "status": "REJECT",
             "reason": str(e),
             "trace_id": None
         }
 
 
 # -------------------------------
-# FILTER VALID SIGNALS
+# FILTER VALID SIGNALS (PIPELINE SAFE)
 # -------------------------------
 def get_validated_signals(signals):
 
     try:
         batch = validate_batch(signals)
 
-        if batch.get("status") == "ERROR":
+        if batch.get("status") == "REJECT":
             return batch
 
         return [
             r for r in batch.get("results", [])
-            if isinstance(r, dict) and r.get("status") in ["VALID", "FLAG"]
+            if isinstance(r, dict) and r.get("status") in ["ALLOW", "FLAG"]
         ]
 
     except Exception as e:
         return {
-            "status": "ERROR",
+            "status": "REJECT",
             "reason": str(e),
             "trace_id": None
         }
