@@ -2,13 +2,13 @@
 
 NICAI is a **deterministic intelligence system** that converts real-world environmental data into **structured, explainable, and traceable intelligence outputs**.
 
-It functions as a **decision-support layer**, not a decision-maker.
+It acts as a **decision-support layer**, not a decision-maker.
 
 ---
 
 # 🚀 What NICAI Does
 
-NICAI processes datasets (Weather, AQI) to:
+NICAI processes real datasets (Weather, AQI) to:
 
 * Validate incoming signals
 * Detect anomalies using rule-based logic
@@ -18,26 +18,26 @@ NICAI processes datasets (Weather, AQI) to:
 * Maintain full traceability using `trace_id`
 
 ⚠️ NICAI does **NOT execute decisions**
-It only generates **intelligence outputs**
+It only produces **intelligence outputs**
 
 ---
 
 # 🧠 Core Capabilities
 
-* Deterministic system (Same Input → Same Output)
-* Explainable outputs (No black-box AI)
+* Deterministic system (**Same Input → Same Output**)
+* Explainable outputs (**No black-box AI**)
 * Multi-signal pattern detection
-* Full traceability (`trace_id`)
-* Crash-safe error handling
+* End-to-end traceability (`trace_id`)
+* Crash-safe failure handling
 * Real-time dashboard visualization
-* Action simulation (no real execution)
+* Action simulation (no execution)
 * Minimal API surface (demo-safe)
 
 ---
 
-# 🏗️ System Architecture
+# 🏗️ Final System Architecture (LOCKED)
 
-```
+```text
 Dataset
    ↓
 Samachar Input Adapter
@@ -48,7 +48,7 @@ Validation Layer
    ↓
 Sanskar Intelligence Engine
    ↓
-Pattern Detection
+Multi-Signal Pattern Analysis
    ↓
 FastAPI Layer
    ↓
@@ -59,11 +59,15 @@ Action Router (Simulation)
 Logging System
 ```
 
+✔ No shortcuts
+✔ No bypass
+✔ Fully deterministic pipeline
+
 ---
 
 # 📂 Project Structure
 
-```
+```text
 nicai_system/
 
 │── main.py
@@ -84,30 +88,32 @@ nicai_system/
 │── TESTING_PACKET.md
 ```
 
+✔ Clean, unified, demo-safe structure
+
 ---
 
 # ▶️ How to Run (Demo Mode)
 
 Run full system:
 
-```
+```bash
 python run_demo_full.py
 ```
 
-This will:
+### This will:
 
 1. Load datasets
 2. Convert into signals
 3. Validate signals
 4. Run intelligence engine
 5. Detect patterns
-6. Start API server
+6. Start FastAPI server
 
 ---
 
 # 🌐 Open Dashboard
 
-```
+```bash
 http://127.0.0.1:8000/dashboard
 ```
 
@@ -115,13 +121,13 @@ http://127.0.0.1:8000/dashboard
 
 # ⚡ API Endpoints
 
-| Endpoint          | Method     | Description   |
-| ----------------- | ---------- | ------------- |
-| `/dashboard`      | GET        | UI Dashboard  |
-| `/action`         | POST       | Log action    |
-| `/nicai/evaluate` | (Optional) | Full pipeline |
+| Endpoint          | Method | Description         |
+| ----------------- | ------ | ------------------- |
+| `/dashboard`      | GET    | UI Dashboard        |
+| `/action`         | POST   | Action logging      |
+| `/nicai/evaluate` | POST   | (Optional) Pipeline |
 
-❌ No unnecessary endpoints (Demo-safe)
+✔ Minimal endpoints → lower demo risk
 
 ---
 
@@ -143,7 +149,7 @@ http://127.0.0.1:8000/dashboard
 
 # 🔍 Validation Layer
 
-Output:
+### Output:
 
 ```json
 {
@@ -155,27 +161,31 @@ Output:
 }
 ```
 
-Handles:
+### Handles:
 
 * Missing fields
 * Invalid dataset
 * Wrong data types
-* Empty inputs
+* Empty input
+
+✔ Deterministic
+✔ Crash-free
 
 ---
 
-# ⚙️ Intelligence Engine
+# ⚙️ Intelligence Engine (Sanskar Engine)
 
-Risk Mapping:
+### Risk Mapping:
 
 * Normal → LOW
 * Elevated → MEDIUM
 * Extreme → HIGH
 
-Output:
+### Output:
 
 ```json
 {
+  "trace_id": "...",
   "risk_level": "HIGH",
   "anomaly_type": "TEMPERATURE_SPIKE",
   "explanation": "Extreme temperature detected",
@@ -185,11 +195,15 @@ Output:
 }
 ```
 
+✔ Explainable
+✔ Rule-based
+✔ Deterministic
+
 ---
 
-# 📈 Pattern Detection
+# 📈 Multi-Signal Pattern Detection
 
-Example:
+### Example Output:
 
 ```json
 {
@@ -202,17 +216,23 @@ Example:
 }
 ```
 
+✔ Uses real processed signals
+✔ Detects clusters & trends
+
 ---
 
 # 🧭 TANTRA Compliance
 
 NICAI does NOT take actions.
 
-Allowed outputs:
+### Allowed Outputs:
 
 * `eligible_for_escalation`
 * `requires_review`
 * `monitor`
+
+❌ No direct execution
+❌ No automation
 
 ---
 
@@ -227,19 +247,20 @@ Displays:
 * Confidence Score
 * Anomaly Type
 * Explanation
-* Recommended Action
+* Recommended Step
 * Action Button
 
-✔ Full traceability visible
-✔ Clean UI for demo
+✔ Fully traceable
+✔ Clean & readable UI
+✔ Demo-safe
 
 ---
 
-# ⚡ Action Layer
+# ⚡ Action Layer (Simulation)
 
-**POST /action**
+**Endpoint:** `POST /action`
 
-Output:
+### Output:
 
 ```json
 {
@@ -254,19 +275,24 @@ Output:
 }
 ```
 
+✔ Logged
+✔ Traceable
+✔ Non-executable
+
 ---
 
 # 📊 Logging System
 
-```
+```text
 logs/
+
 │── validation_logs.json
 │── anomaly_logs.json
 │── pattern_logs.json
 │── action_logs.json
 ```
 
-Format:
+### Format:
 
 ```json
 {
@@ -277,38 +303,53 @@ Format:
 }
 ```
 
+✔ Auto-generated
+✔ No manual setup required
+
 ---
 
 # 🔗 Traceability Flow
 
-```
+```text
 Signal → Validation → Analysis → Pattern → Dashboard → Action Log
 ```
+
+✔ Same `trace_id` across all layers
+✔ Full auditability
 
 ---
 
 # 🎯 Demo Flow
 
-1. Run system
-2. Observe signals
-3. Detect anomalies
-4. View pattern summary
-5. Open dashboard
-6. Trigger action
-7. Check logs
-8. Track via trace_id
+1. Run system (`run_demo_full.py`)
+2. Show dataset ingestion
+3. Show signal generation
+4. Show validation + intelligence
+5. Show pattern detection
+6. Open dashboard
+7. Trigger action
+8. Show logs
+9. Verify trace_id
+
+✔ Stable & repeatable demo
 
 ---
 
 # 🔒 Deterministic Guarantee
 
+```text
 Same Input → Same Output
+```
+
+✔ No randomness
+✔ Fixed rules
+✔ Consistent outputs
 
 ---
 
 # 📌 Final Status
 
-* ✅ Fully Functional
+* ✅ Fully Integrated
 * ✅ Crash-Free
 * ✅ Deterministic
 * ✅ Traceable
