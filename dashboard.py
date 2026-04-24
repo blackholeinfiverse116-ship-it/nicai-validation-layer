@@ -68,7 +68,7 @@ def detect_zone(lat):
 
 
 # -------------------------------
-# ACTION ROUTER
+# ACTION ROUTER (TANTRA SAFE)
 # -------------------------------
 @app.post("/action")
 def action_router(data: dict):
@@ -83,11 +83,11 @@ def action_router(data: dict):
         elif risk == "MEDIUM":
             target_role = "operator"
         else:
-            target_role = "monitor"
+            target_role = "system"
 
         action_payload = {
             "trace_id": str(data.get("trace_id")),
-            "action_type": str(data.get("action_type")),
+            "action_type": str(data.get("action_type")),  # already compliant
             "target_role": target_role,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "context": {}
@@ -108,7 +108,7 @@ def action_router(data: dict):
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard():
 
-    print("🔥 DASHBOARD NEW VERSION RUNNING")  # DEBUG
+    print("🔥 FINAL DASHBOARD RUNNING")
 
     try:
         weather, aqi = load_data()
@@ -125,35 +125,37 @@ def dashboard():
             if not isinstance(signal, dict):
                 continue
 
+            # ✅ VALIDATION (FIXED)
             validation = validate_signal(signal)
-            if validation.get("status") == "ERROR":
+            if validation.get("status") == "REJECT":
                 continue
 
+            # ANALYSIS
             analysis = analyze_signal(signal)
             if not isinstance(analysis, dict):
                 continue
 
             lat = to_float(signal.get("latitude"))
-            lon = to_float(signal.get("longitude"))
             zone = detect_zone(lat)
-
             risk = str(analysis.get("risk_level", "LOW"))
 
-            # ✅ Recommended Step
+            # ✅ TANTRA-COMPLIANT ACTIONS
             if risk == "HIGH":
                 step = "Escalation recommended"
                 action_label = "Escalate"
                 action_type = "eligible_for_escalation"
                 row_color = "#ffe6e6"
+
             elif risk == "MEDIUM":
                 step = "Needs review"
                 action_label = "Review"
                 action_type = "requires_review"
                 row_color = "#fff5cc"
+
             else:
                 step = "Monitor"
                 action_label = "Monitor"
-                action_type = "MONITOR"
+                action_type = "monitor"
                 row_color = ""
 
             trace_id = str(validation.get("trace_id"))
@@ -163,7 +165,7 @@ def dashboard():
                 "trace_id": trace_id,
                 "risk_level": risk,
                 "latitude": lat,
-                "longitude": lon,
+                "longitude": to_float(signal.get("longitude")),
                 "anomaly_score": float(analysis.get("anomaly_score", 0))
             })
 
@@ -187,7 +189,7 @@ def dashboard():
             </tr>
             """
 
-        # Pattern
+        # PATTERN
         try:
             pattern = analyze_patterns(processed_outputs)
         except Exception as e:
@@ -208,6 +210,7 @@ def dashboard():
         <html>
         <head>
             <title>NICAI Dashboard</title>
+
             <script>
             async function sendAction(trace_id, action_type, risk) {{
                 await fetch("/action", {{
@@ -223,9 +226,11 @@ def dashboard():
                 location.reload();
             }}
             </script>
+
         </head>
 
         <body>
+
         <h2>NICAI Dashboard</h2>
 
         <p>Total Signals: {total_signals}</p>
@@ -247,6 +252,7 @@ def dashboard():
         {rows}
 
         </table>
+
         </body>
         </html>
         """
